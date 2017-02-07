@@ -1,0 +1,8 @@
+en index 
+<div class="quick-launch-panel" data-ng-include="'app/common/quick-launch-panel.html'"></div>-->
+
+en common/layout.html
+las opciones , chat
+
+en common/ header.html
+toda la ultima parte que es para habilitar las opciones chats etc

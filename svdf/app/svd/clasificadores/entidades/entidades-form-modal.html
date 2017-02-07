@@ -1,0 +1,70 @@
+<!--<div class="modal fade" >-->
+<!--<div class="modal-dialog">-->
+
+<!-- Modal content-->
+<!--<div class="modal-content">-->
+<div class="modal-header {{estilo.modalHeader}}">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class="{{estilo.modalTitle}} modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div class="modal-body">
+    <div id="mensajeErr" class='bg-danger p5 bold pl15 mb10' hidden="" >
+        <i class='fa fa-times-circle fa-lg '></i> 
+        <span ng-bind="mensajeErr"> </span>
+    </div>
+    
+    <div class=" form-horizontal pr20"> 
+        <div class='form-group'>
+            <label  class="control-label col-md-2"><b>Tipo entidad: </b></label>
+            <select style='width: 300px' class="form-control" ng-model="contexto.cTipoEntidad" ng-options="item.cTipoEntidad as item.cTipoEntidad +  ' ' +   item.tDescripcionCorta  for item in listaTiposEnts">
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="codigo"  class="control-label col-md-2">Codigo: </label>
+            <div class="col-md-3">
+                <input type="text" id="codigo" class="form-control"  ng-model="contexto.cEmpresa" ng-disabled="contexto.disabled" placeholder="Código" >
+            </div>
+        </div>     
+        <div class="form-group">
+            <label for="sigla"  class="control-label col-md-2">Sigla: </label>
+            <div class="col-md-3">
+                <input type="text" id="sigla" class="form-control"    ng-model="contexto.tSigla" placeholder="Sigla" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="nombre"  class="control-label col-md-2">Nombre: </label>
+            <div class="col-md-10">
+                <input type="text" id="nombre" class="form-control"   ng-model="contexto.tNombre" placeholder="Nombre">                 
+            </div>
+        </div>  
+        <div class="form-group">
+            <label for="nombre"  class="control-label col-md-2">Nombre Corto: </label>
+            <div class="col-md-3">
+                <input type="text" id="nombre" class="form-control"   ng-model="contexto.tNombreCorto" placeholder="Nombre">                 
+            </div>
+        </div> 
+        <div class="form-group">
+            <label for="rs_funcionamiento" class="control-label col-md-2">Res. Adm. Funcionamiento: </label>
+            <div class="col-md-10">
+                <input type="text" id="rs_funcionamiento" class="form-control"    ng-model="contexto.tFuncionamiento"  placeholder="Rs funcionamiento">                 
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="rs_adecuacion"  class="control-label col-md-2">Res. Adm. de Adecuación: </label>
+            <div class="col-md-10">
+                <input type="text" id="rs_adecuacion" class="form-control"   ng-model="contexto.tAdecuacion" placeholder="Rs adecuación">
+            </div>
+        </div> 
+        <div class="form-group">
+            <label class="control-label col-md-2">Activo: </label>
+            <div class="col-md-10">
+                <label class="switch switch-sm">
+                    <input type="checkbox" id="someSwitchOptionSuccess"  ng-model="contexto.bHabilitado"  ng-true-value="'S'" ng-false-value="'N'" />
+                    <span><i class="handle"></i></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-include= "'app/common/modalFooter.html'"></div>

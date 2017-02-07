@@ -1,0 +1,102 @@
+<div class="brand">
+
+    <!-- logo -->
+    <div class="brand-logo">
+        <img data-ng-src="styles/images/logo-small.png" alt="">
+    </div>
+    <!-- /logo -->
+
+    <!-- toggle small sidebar menu -->
+    <a href="javascript:;" class="toggle-sidebar hidden-xs hamburger-icon v3" data-ng-click="app.layout.isSmallSidebar = !app.layout.isSmallSidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </a>
+    <!-- /toggle small sidebar menu -->
+
+</div>
+
+<!-- main navigation -->
+<nav role="navigation" side-navigation>
+    <ul class="nav">
+
+        <!-- dashboard -->
+        <li ui-sref-active="active">
+            <a href="#/">
+                <i class="fa fa-institution"></i>
+                <span>Inicio</span>
+            </a>
+        </li>
+        <!-- /dashboard -->
+
+
+        <li ui-sref-active="active">
+            <a ui-sref="app.svd_envio">
+                <i class="fa fa-tags"></i>
+                <span>Envío de información</span>
+            </a>
+        </li>
+        <li ui-sref-active="active">
+            <a ui-sref="app.svd_control">
+                <i class="fa fa-dashboard"></i>
+                <span>Control de envíos</span>
+            </a>
+        </li>        
+        <li ui-sref-active="active">
+            <a ui-sref="app.svd_consolidacion">
+                <i class="fa fa-cubes"></i>
+                <span>Cierre y consolidación</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:;">
+                <i class="fa fa-cogs"></i>
+                <span>Clasificadores</span>
+                <!--<span class="label label-info pull-right">new</span>-->
+            </a>
+            <ul class="sub-menu">
+                <li ui-sref-active="active" >
+                    <a ui-sref="app.svd_cla_entidades">
+                        <span>Entidades</span>
+                    </a>
+                </li>
+                <li ui-sref-active="active" >
+                    <a ui-sref="app.svd_cla_tipoEntidad">
+                        <span>Tipos de Entidades</span>
+                    </a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="app.svd_cla_archivos">
+                        <span>Archivos ASCII</span>
+                    </a>
+                </li>
+                <li ui-sref-active="active" permission permission-except="'AUTHORIZED'">
+                    <a ui-sref="app.svd_cla_cotizaciones">
+                        <span>Cotizaciones</span>
+                    </a>
+                </li>
+                <li ui-sref-active="active" permission permission-except="'AUTHORIZED'">
+                    <a ui-sref="app.svd_cla_modalidades">
+                        <span>Modalidades</span>
+                    </a>
+                </li>
+                <li ui-sref-active="active" permission permission-except="'AUTHORIZED'">
+                    <a ui-sref="app.svd_cla_ramos">
+                        <span>Ramos</span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li ui-sref-active="active">
+            <a ui-sref="app.svd_configuracion">
+                <i class="fa fa-cog"></i>
+                <span>Configuración</span>
+            </a>
+        </li>
+
+    </ul>
+</nav>
+<!-- /main navigation -->

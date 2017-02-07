@@ -1,0 +1,114 @@
+<div class="panel panel-body panel-default">
+    <div>
+        <h3 class="text-center">RESULTADO DE LA VALIDACION </h3>
+        <h3 class="bold">{{val.ctxEntidad.sigla}} - {{val.ctxEntidad.nombre_entidad}}</h3>
+        <hr>
+        <div class="row bold">
+            <div class="col-sm-3 ">
+                <div>
+                    Código: {{val.ctxEntidad.cod_entidad}}<br>
+                    Tipo: {{val.ctxEntidad.desc_tipo_entidad}}<br> 
+                    Fecha de envío: {{util.getFecha(val.ctxEntidad.fecha_envio)}}
+                </div>
+            </div>
+            <div class="col-sm-3">
+                Periodo de fiscalización: {{meses[val.ctxApertura.mes] + " " + val.ctxApertura.ano}}<br>
+                Fecha de corte: {{util.getFecha(val.ctxApertura.fecha_corte)}} 
+            </div>
+            <div class="col-sm-3">
+                Factor AITB: {{val.ctxApertura.factor_tc}}<br>
+                Márgen aceptable para diferencias con EF: {{val.ctxApertura.margen_partes_ef}}            
+            </div>
+            <div class="col-sm-3">
+                <b>Codigos de error</b><br>
+                V: sin error<br> 
+                A: Advertencia<br>
+                E: Err. Subsanable<br>   
+                EE: Error grave<br>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <div>
+        <div class="{{estiloAlert[val.estadoValidez]}} p5">
+            Resultado: <b>Información  {{val.estadoValidez > 2 ? 'VALIDA' : 'NO VALIDA'}} </b><br>
+            Tipo de Error: {{val.estadoValidez_desc}}
+        </div>
+        <hr>
+    </div>
+
+    <div>
+        <h3>Validación de Formato</h3>
+        <p ng-bind="val.mensajeFormato"></p>
+        <ul>
+            <li ng-repeat="err in val.erroresF| orderBy: err.archivo">
+                <span class="{{err.error[0]=='E' ? 'text-danger':''}} "> {{err.error}}. {{err.desc_error}}</span> - {{err.descripcion_puntual}}. En archivo: {{err.archivo}}, (fila: {{err.fila}}, col: {{err.columna}})  
+            </li>
+        </ul>
+        <hr>
+    </div>
+    <div>
+        <h3>Validación de Contenido</h3>
+        <p ng-bind="val.mensajeContenido"></p>
+
+        <!--#########################################           EF Validacion EF  #####################33##########################-->
+
+        <div>
+            <h4>Validacion de Partes de Producción y Siniestros con Estados Financieros</h4>
+            <div>
+                <div ng-repeat="elem in val.datosEF" class="mt5" >
+                    <ul class="list-group">
+                        <li class="ml25">
+                            <b>{{elem.validacion}}:</b> 
+                            <p><span class="{{!elem.valido ?'text-danger':'text-success'}}  bold ">
+                                    {{elem.descripcionError}}
+                                </span>
+                            </p>
+                        </li>
+                    </ul>
+                    <table class="table table-condensed table-bordered" ng-show="!elem.valido">
+                        <thead class='bg-dark-light'>
+                            <tr>
+                                <th>Monto Parte</th><th>Monto Parte en Bs.</th><th>Monto E.F.</th>
+                                <th>diferencia</th><th>diferencia con Bs.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{elem.data.monto_parte| number}}</td><td>{{elem.data.monto_parte_bs| number}}</td> <td>{{elem.data.monto_ef| number}}</td>
+                                <td>{{elem.data.diferencia| number}}</td><td>{{elem.data.diferencia_con_bs| number}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div ng-repeat="elem in val.datosContenido"  >
+            <h4 ng-show="elem.titulo">{{elem.titulo}}</h4>
+            <ul class="list-group">
+                <li class="ml25">
+                    <b>{{elem.validacion}} </b> 
+                    <p><span class="{{!elem.valido?'text-danger':'text-success'}}  bold ">
+                            {{elem.descripcionError}}
+                        </span>
+                    </p>
+                </li>
+            </ul>
+            <table class="table table-condensed table-bordered" ng-show="elem.data.length > 0">
+                <thead class='bg-dark-light'>
+                    <tr>
+                        <th ng-repeat="prop in  elem.cabeceras">{{prop}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in elem.data">
+                        <td ng-repeat="prop in  elem.propiedades">{{ esNumero(row[prop]) ? (row[prop] | number) : (row[prop])}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+</div>

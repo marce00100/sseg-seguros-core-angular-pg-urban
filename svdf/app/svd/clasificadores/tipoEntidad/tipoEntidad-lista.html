@@ -1,0 +1,49 @@
+<div class="container-fluid">
+    <h3>Tipos de entidades</h3>
+    <span><b>Total: <span class="badge ">{{lista.length}}</span></b></span>
+    <div class="row">
+        <div class="col-lg-10 col-md-12">
+            <div ng-show="lista" style="margin-top: 40px ">
+
+                <div class="row">
+                    <div class="col-md-1">
+                        <button class="btn btn-success btn-icon" ng-click="muestraForm()"> 
+                            <i class="fa fa-plus"></i>
+                            <span> Agregar</span>
+                        </button>
+                    </div>
+                    <div class=' pull-right'>
+                        <span>búsqueda: <input type="text"  ng-model="txtFiltroBusqueda" style="width: 300px"></span>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25">
+                    <thead ng-class="estilo.tableHead">
+                        <tr>
+                            <th></th>
+                            <th>Cod.</th>
+                            <th>Descripción</th>
+                            <th>Descripción corta</th>
+                            <th>codigo rango</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in lista| filter: txtFiltroBusqueda ">
+                            <td>{{$index + 1}}</td>
+                            <td><b><span ng-bind="item.cTipoEntidad"></span></b></td>
+                            <td><b><span ng-bind="item.tDescripcion"></span></b></td>                              
+                            <td><span ng-bind="item.tDescripcionCorta"></span></td>                              
+                            <td><span ng-bind="item.tCodigo"></span></td>
+                            <td>
+                                <a href=""  ng-click="muestraForm(item)" class="fa fa-lg fa-pencil m5" title="editar"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
