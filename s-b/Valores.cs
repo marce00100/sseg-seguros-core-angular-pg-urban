@@ -15,10 +15,22 @@ namespace SVD
 
 
         // Determina si se deben poblar las tablas (true) o no (false) de la base de datos en SQL de la base de datos dbSeguros
+        // Una vez que se tenga la base de dtaos completa en Postgres y no dependan otros sistemas de SQL esta opcion se debe colocar a False
         public static bool poblarSQLTablasDbSeguros = true;
 
         // Determina si se deben poblar las tablas (true) o no (false) de la base de datos en SQL de la base de datos dbSeguros_OLAP
+        // Una vez que se tenga la base de dtaos completa en Postgres y no dependan otros sistemas de SQL esta opcion se debe colocar a False
         public static bool poblarSQLTablasDbSegurosOLAP = true;
+
+        // Determina si se deben poblar las tablas (true) o no (false) de la base de datos Postgres para cierre 
+        // por motivos de velocidad es mejor que esta opcion este e apagada mientras no se tenga completamente funcional y migrada  la base de datos en POstgres 
+        public static bool poblarPGTablasdeCierre = true;
+
+        // Determina si se deben poblar las tablas (true) o no (false) de la base de datos en  POSTGREs de la base de datos dbSeguros_OLAP
+        // por motivos de velocidad es mejor que esta opcion este e apagada mientras no se tenga completamente funcional y migrada  la base de datos en POstgres 
+        public static bool poblarPGTablasDbSegurosOLAP = true;
+
+
 
     }
 }

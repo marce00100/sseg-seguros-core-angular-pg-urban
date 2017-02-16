@@ -197,15 +197,16 @@ namespace SVD.Controllers
             ErroresController.borrarErroresDelLaMismaApertura(this.codigoEntidad);
             int idSeguimiento = SgmntController.insertarSeguimientoEnvio(this.codigoEntidad, validezF);
             int estadoValidez = 4;
-            foreach (Error error in this.errores)
+            foreach (Error errorF in this.errores)
             {
-                error.id_seguimiento_envio = idSeguimiento;
-                ErroresController.insertarError(error);
-                error.desc_error = descError(error.cod_error);
-                if (error.estadoValidez < estadoValidez)
-                    estadoValidez = error.estadoValidez;
+                errorF.id_seguimiento_envio = idSeguimiento;
+                ErroresController.insertarError(errorF);
+
+                errorF.desc_error = descError(errorF.cod_error);
+                if (errorF.estadoValidez < estadoValidez)
+                    estadoValidez = errorF.estadoValidez;
             }
-            con.Close(); 
+            con.Close();
             List<dynamic> constantes = ConstantesController.obtieneConstantesDeDimension("estado_seguimiento");
             dynamic estadoSeg = constantes.Where(x => x.codigo == estadoValidez.ToString()).LastOrDefault();
 
@@ -228,8 +229,9 @@ namespace SVD.Controllers
             this.archivosEntidadCadena = ArchivosController.encadenaArchivosDeEntidadMes(this.codigoEntidad, this.mesControl);
             // realiza la validacion_________________________________________________>>>>>>
             dynamic valContenido = this.realizarValidacionContenido();
-            int estadoValidezC = valContenido.estadoValidez; ;
+            int estadoValidezC = valContenido.estadoValidez;
 
+            // obtiene el estado de validez que tiene seguimiento_envio ya guardado en la validacion de formato
             dynamic segEntidad = SgmntController.seguimientoAperturaActivaEntidad(this.codigoEntidad);
             int estadoValidez = Convert.ToInt16(segEntidad.estado);
 
@@ -257,7 +259,7 @@ namespace SVD.Controllers
             }
 
             List<dynamic> constantes = ConstantesController.obtieneConstantesDeDimension("estado_seguimiento");
-            dynamic estadoSeg = constantes.Where(x => x.codigo == estadoValidez.ToString()).LastOrDefault();
+            dynamic estadoSeg = constantes.Where(x => x.codigo == estadoValidez.ToString()).FirstOrDefault();
 
             this.con.Close();
             this.resultado.status = "success";
@@ -316,10 +318,9 @@ namespace SVD.Controllers
 
 
         /// #############################       VALIDACION  de    H I S t O R I C O        ////////////////////////////////////////////////////// 
-        [HttpGet("consulta/{web_reporte}/{idseg}")] // web_reporte puede ser "web" o "reporte"
-        public object validacionConsultaPartesEF(string web_reporte, int idSeg) //objetoRecibido = {id_seguimiento_envio }
+        [HttpGet("consulta/{web_reporte}/{idSeguimientoEnvio}")] //  web_reporte puede ser "web" o "reporte"
+        public object validacionConsultaPartesEF(string web_reporte, int idSeguimientoEnvio) //objetoRecibido = {id_seguimiento_envio }
         {
-            int idSeguimientoEnvio = idSeg; // objetoRecibido.id_seguimiento_envio;
             List<Error> erroresLista = ErroresController.getErroresDeSeguimiento(idSeguimientoEnvio);
             dynamic seguimientoEntidadDatos = SgmntController.getSeguimientoEntidadDatos(idSeguimientoEnvio);
             this.codigoEntidad = seguimientoEntidadDatos.cod_entidad.ToString();
@@ -342,53 +343,61 @@ namespace SVD.Controllers
             ////////////////////// FORMATO ////////////////////////////////////////////////
             IEnumerable<Error> erroresF = erroresLista.Where(x => x.cod_error.Substring(0, 1) == "0").OrderBy(x => x.cod_error);
             bool validoF = true;
+            int estadoValidez = 4;
             foreach (Error errorF in erroresF)
             {
                 errorF.desc_error = descError(errorF.cod_error);
-                if (!errorF.valido)
-                    validoF = false;
+                errorF.estadoValidez = estadoValidezDeError(errorF);
+                if (errorF.estadoValidez < estadoValidez)
+                    estadoValidez = errorF.estadoValidez;
             }
-            if (validoF)
+            if (estadoValidez > 1) // si no hay EE
             {
-
-
                 // //////////////////////////////Validacion contenidos SIf y varios
                 dynamic valContenido = this.realizarValidacionContenido();
                 int estadoValidezC = valContenido.estadoValidez;
+                this.resultado.estadoValidezC = estadoValidezC;
                 this.resultado.validoC = estadoValidezC > 2;
                 if (web_reporte == "web") //si es WEB se carga en una lista
                 {
-                    this.resultado.listaValContenido = this.listaValCont;
+                    this.resultado.datosC = this.listaValCont;
                     this.resultado.validacionC = null;
                 }
                 else if (web_reporte == "reporte") //  sie es en para reporte se separa en objetos que tinen la misma estuctura
                 {
                     this.resultado.validacionC = valContenido;
-                    this.resultado.listaValContenido = null;
+                    this.resultado.datosC = null;
                 }
 
                 /////////////////////////////// Validacion de Partes de Producción y Siniestros  con Estados Financieros ///////////////////////////////////////////
                 int estadoValidezEF = this.validaPartesEF();
+                this.resultado.estadoValidezEF = estadoValidezEF;
                 this.resultado.validoEF = estadoValidezEF > 2;
-                this.resultado.validacionEF = listaValEF;
+                this.resultado.datosEF = listaValEF;
+
+                // del resultado gral
+                estadoValidez = Math.Min(estadoValidez, Math.Min(estadoValidezC, estadoValidezEF));
             }
+            else
+                validoF = false;
 
-
-            this.resultado.status = "succes";
             this.resultado.aperturaDatos = this.aperturaDatos;
             this.resultado.seguimientoEntidadDatos = seguimientoEntidadDatos;
 
+
+            List<dynamic> constantes = ConstantesController.obtieneConstantesDeDimension("estado_seguimiento");
+            dynamic estadoSeg = constantes.Where(x => x.codigo == estadoValidez.ToString()).FirstOrDefault();
+
+            this.con.Close();
+            this.resultado.status = "success";
+            this.resultado.estadoValidez = estadoValidez;
+            this.resultado.estadoValidez_desc = estadoSeg.valor + " - " + estadoSeg.descripcion;
+
             this.resultado.validoF = validoF;
             this.resultado.erroresF = erroresF;
+
             return this.resultado;
         }
-
-
-
-
-
-
-
 
 
         [HttpGet("prueba/{op}")]

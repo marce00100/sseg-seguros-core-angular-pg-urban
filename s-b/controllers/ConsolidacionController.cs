@@ -61,13 +61,16 @@ namespace SVD.Controllers
 
         }
 
+        //##############################################################################################################################
         /////////////////////////////////////////////  1. CONSOLIDACION /////////////////////////////////////////////////////////////
 
         [HttpPost("envios_validos")]
-        public object consolidacionDeEntidad() //op puede ser consolidar o continuarConsolidacion
+        public object consolidacionDeEntidad([FromBody]dynamic objObservaciones) 
         {
             SgmntController segObj = new SgmntController();
             List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            enviosAct = enviosAct.Where(x => x.valido && (x.estado_cierre == null || x.estado_cierre == "")).ToList();
+
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
             con.Close();
             this.inicializaGlobalVars();
@@ -77,89 +80,88 @@ namespace SVD.Controllers
             bool procesoExitoso = true;
             Exception excepcion = null; // TO DO habilitar error para visualizar errores, deshabilitar en produccion 
 
-
-            dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
-            //INICIALIZA PROCESO CONSOLIDACION 
-            int id_consolidacion = consolidacionActiva.id_consolidacion;// this.insertConsolidacion();
-            this.estadoConsolidacion(id_consolidacion, "procesando");
-            // Realiza la consolidacion por cada entidad que ha eviado y la info sea valida y activa
-            foreach (dynamic envio in enviosAct)
+            if (enviosAct.Count > 0)
             {
-                try
+                // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
+                //INICIALIZA PROCESO CONSOLIDACION 
+                int id_consolidacion = this.insertConsolidacion(objObservaciones.observaciones.ToString()); 
+
+                foreach (dynamic envio in enviosAct)
                 {
-                    // Realiza la consolidacion por cada entidad que ha eviado y la info sea valida y activa, y no haya sido consolidaa
-                    // System.Threading.Thread.Sleep(15000);
-                    if (envio.valido && (envio.estado_cierre == null || envio.estado_cierre == ""))
+                    try
                     {
-                        this.ctxSeguimiento = envio;
-                        this.codigoEntidad = ctxSeguimiento.cod_entidad;
-
-                        // llena las tablas iftPartesProduccionSiniestros, 
-                        this.llenaIftPartesProduccionSiniestros(this.codigoEntidad);
-                        // llena las tablas iftPartesProduccionRamos, 
-                        this.llenaIftPartesProduccionRamos(this.codigoEntidad);
-                        // llena iftPartesSiniestrosRamos 
-                        this.llenaIftPartesSiniestrosRamos(this.codigoEntidad);
-                        // llena tabla , iftPartesSegurosLargoPlazo
-                        this.llenaIftPartesSegurosLargoPlazo(this.codigoEntidad);
-                        // Se realiza la consolidacion
-                        // carga los saldos totales de la tabla val_balance_estado_resultados
-                        this.llenaSaldosTotales(this.codigoEntidad);
-                        //  1  realiza la carga a la tabla iftBalanceEstadoResultados  sin duplicados
-                        this.consolidaInfoMensualAntesDeCierre(this.codigoEntidad);
-                        // 2. Consolida PartesProduccionCorredoras  iftPartesProduccionCorredoras
-                        this.consolidaProduccionCorredoras(this.codigoEntidad);
-
-                        // 3 inserta las excepciones  Caso BUPA 201
-                        this.insertarComodines();
-
-                        if (esMesSolvencia)
+                        // Realiza la consolidacion por cada entidad que ha eviado y la info sea valida y activa, y no haya sido consolidaa
+                        // System.Threading.Thread.Sleep(15000);
+                        if (envio.valido && (envio.estado_cierre == null || envio.estado_cierre == ""))
                         {
-                            //inserta campos vacios por la entidad en las tablas iftPatrimonioTecnico y tMSPrevisionales
-                            this.insertaPatrimonioTecnicoVacio();
-                            this.insertaMargenSolvenciaPrevisionalesVacio();
-                        }
-                        this.paso = 1;
+                            this.ctxSeguimiento = envio;
+                            this.codigoEntidad = ctxSeguimiento.cod_entidad;
 
-                        // llama al metodo que realiza pasos para el cierre
-                        this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
-                        // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
-                        this.procedimientosCierreHastaSIG(this.codigoEntidad);
+                            // llena las tablas iftPartesProduccionSiniestros, 
+                            this.llenaIftPartesProduccionSiniestros(this.codigoEntidad);
+                            // llena las tablas iftPartesProduccionRamos, 
+                            // this.llenaIftPartesProduccionRamos(this.codigoEntidad);
+                            // // llena iftPartesSiniestrosRamos 
+                            // this.llenaIftPartesSiniestrosRamos(this.codigoEntidad);
+                            // // llena tabla , iftPartesSegurosLargoPlazo
+                            // this.llenaIftPartesSegurosLargoPlazo(this.codigoEntidad);
+                            // // Se realiza la consolidacion
+                            // // carga los saldos totales de la tabla val_balance_estado_resultados
+                            // this.llenaSaldosTotales(this.codigoEntidad);
+                            // //  1  realiza la carga a la tabla iftBalanceEstadoResultados  sin duplicados
+                            // this.consolidaInfoMensualAntesDeCierre(this.codigoEntidad);
+                            // // 2. Consolida PartesProduccionCorredoras  iftPartesProduccionCorredoras
+                            // this.consolidaProduccionCorredoras(this.codigoEntidad);
 
-                        // this.informacionFinancieraOLAP();
+                            // // 3 inserta las excepciones  Caso BUPA 201
+                            // this.insertarComodines();
+
+                            if (esMesSolvencia)
+                            {
+                                //inserta campos vacios por la entidad en las tablas iftPatrimonioTecnico y tMSPrevisionales
+                                this.insertaPatrimonioTecnicoVacio();
+                                this.insertaMargenSolvenciaPrevisionalesVacio();
+                            }
+                            this.paso = 1;
+
+                            // // llama al metodo que realiza pasos para el cierre
+                            this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
+                            // // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
+                            // this.procedimientosCierreHastaSIG(this.codigoEntidad);
+
+                            // // this.informacionFinancieraOLAP();
 
 
-
-                        ////_____________________________ se crea la respuesta  que es una lista de las compañias enviadas ________________________                    
-                        object seguimientoConsolidacion = new
-                        {
-                            id_seguimiento_envio = envio.id_seguimiento_envio,
-                            cod_entidad = envio.cod_entidad,
-                            id_consolidacion = id_consolidacion,
-                            estado_cierre = estadoCierre
-                        };
-
-
-                        // asigna el valor de id_consolidacion al seguimiento y le asigna su estadoCierre
-                        con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
+                            ////_____________________________ se crea la respuesta  que es una lista de las compañias enviadas ________________________                    
+                            object seguimientoConsolidacion = new
+                            {
+                                id_seguimiento_envio = envio.id_seguimiento_envio,
+                                cod_entidad = envio.cod_entidad,
+                                id_consolidacion = id_consolidacion,
+                                estado_cierre = estadoCierre
+                            };
+                            // asigna el valor de id_consolidacion al seguimiento y le asigna su estadoCierre
+                            con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
                             WHERE id_seguimiento_envio = @id_seguimiento_envio", seguimientoConsolidacion);
-                        con.Close();
+                            con.Close();
 
-                        listaRes.Add(seguimientoConsolidacion);
+                            listaRes.Add(seguimientoConsolidacion);
 
+                        }
                     }
-                }
-                catch (Exception e)
-                {
-                    procesoExitoso = false;
-                    excepcion = e;
-                    break;
+                    catch (Exception e)
+                    {
+                        procesoExitoso = false;
+                        excepcion = e;
+                        break;
+                    };
                 };
-            };
 
-            estadoCierre = procesoExitoso ? estadoCierre : consolidacionActiva.estado; //  si no hubo error se cambi al estado Consolidado o cerrado , segun si fue normal o trimestral, caso contrario "consolidacion.estado" vuelve al valor que tenia originalmente
-            this.estadoConsolidacion(id_consolidacion, estadoCierre);
 
+
+                estadoCierre = procesoExitoso ? estadoCierre : ""; //  si no hubo error se cambi al estado Consolidado o cerrado , segun si fue normal o trimestral, caso contrario "consolidacion.estado" vuelve al valor que tenia originalmente
+                this.estadoConsolidacion(id_consolidacion, estadoCierre, false);
+            }
             con.Close();
             conSegSql.Close();
             return new
@@ -177,73 +179,82 @@ namespace SVD.Controllers
             };
         }
 
+        //##############################################################################################################################################
         ////////////////////////////////////////// 2 CIERRE  en caso de necesitar margen de Solvencia (TRIMESTRAL)  ///////////////////////////////////////////////////////////////////////
         [HttpPost("re_calcular_margen_solvencia")] // este ptroceso es llamado cuando es el caso del Margen de solvencia, cada trimestre, se realiza esta segunda llamada a los procesos del 1 al 4b
-        public object cerrarConsolidados([FromBody]dynamic consolidadosOb) //op puede ser consolidar o continuarConsolidacion
+        public object cerrarConsolidados([FromBody]List<dynamic> consolidadosOb) //consolidadosOB tiene los objetos envio  con mPatTecnico y mMSPrevisional de cada entidad
         {
             SgmntController segObj = new SgmntController();
             List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            List<dynamic> consolidacionesList = enviosAct.Where(x => x.estado_cierre != null && x.estado_cierre == "consolidado").Select(x => x.id_consolidacion).Distinct().ToList();
+
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
             con.Close();
             this.inicializaGlobalVars();
             List<dynamic> listaRes = new List<dynamic>();
 
             bool procesoExitoso = true;
-            Exception excepcion = null; // TO DO habilitar error para visualizar errores, deshabilitar en produccion 
+            Exception excepcion = null;
 
-            dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
-            //INICIALIZA PROCESO CONSOLIDACION 
-            int id_consolidacion = consolidacionActiva.id_consolidacion;
+            // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
+            // //INICIALIZA PROCESO CONSOLIDACION 
+            // int id_consolidacion = consolidacionActiva.id_consolidacion;
 
             string estadoCierre = "cerrado";
-            foreach (dynamic envio in consolidadosOb)
+            foreach (dynamic consolidacionId in consolidacionesList)
             {
-                try
+                int id_consolidacion = Convert.ToInt32(consolidacionId);
+                List<dynamic> enviosConsolidacion = enviosAct.Where(x => x.id_consolidacion == id_consolidacion).ToList();
+                // return consolidacionesList;
+                foreach (dynamic envio in enviosConsolidacion)
                 {
-                    id_consolidacion = envio.id_consolidacion;
-                    estadoConsolidacion(id_consolidacion, "procesando");
-                    if ((bool)envio.valido == true && envio.estado_cierre == "consolidado")
+                    try
                     {
-                        this.ctxSeguimiento = envio;
-                        this.codigoEntidad = envio.cod_entidad;
-
-                        //inserta los valores de PAtrimonioTecnico y MSprevisional 
-                        decimal valorPT = Convert.ToDecimal(envio.mPatTecnico.ToString().Replace(".", ",")); //envio.mPatTecnico.ToString().ToDecimal();
-                        decimal valorMSprevisional = Convert.ToDecimal(envio.mMSPrevisional.ToString().Replace(".", ","));
-                        this.insertarPatrimonioTecnico(valorPT);
-                        this.insertarMSolvenciaPrevisional(valorMSprevisional);
-
-                        // llama al metodo que realiza solo los pasos hasta el calculo de Margen de solvencia e indicadores
-                        this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
-
-
-                        // Todos los consolidados pasan a estado cerrado
-                        ////_____________________________ se crea la respuesta  que es una lista de las compañias modificadas ________________________                    
-                        object seguimientoConsolidacion = new
+                        if ((bool)envio.valido == true && envio.estado_cierre == "consolidado" && envio.id_consolidacion == id_consolidacion)
                         {
-                            id_seguimiento_envio = (int)envio.id_seguimiento_envio,
-                            id_consolidacion = (int)envio.id_consolidacion,
-                            estado_cierre = estadoCierre.ToString()
-                        };
+                            this.ctxSeguimiento = envio;
+                            this.codigoEntidad = envio.cod_entidad;
 
-                        // asigna  al seguimiento su estadoCierre
-                        con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
+                            dynamic consolidadoOBItem = consolidadosOb.Where(x => x.id_seguimiento_envio == envio.id_seguimiento_envio).FirstOrDefault();
+                            //inserta los valores de PAtrimonioTecnico y MSprevisional 
+                            decimal valorPT = Convert.ToDecimal(consolidadoOBItem.mPatTecnico.ToString().Replace(".", ",")); //envio.mPatTecnico.ToString().ToDecimal();
+                            decimal valorMSprevisional = Convert.ToDecimal(consolidadoOBItem.mMSPrevisional.ToString().Replace(".", ","));
+
+                            this.insertarPatrimonioTecnico(valorPT);
+                            this.insertarMSolvenciaPrevisional(valorMSprevisional);
+
+                            //______________________ Continua con los pasos Hasta Margen de Solvencia _______________________
+                            // llama al metodo que  realiza solo los pasos hasta el calculo de Margen de solvencia e indicadores
+                            this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
+
+
+                            // Todos los consolidados pasan a estado cerrado                  
+                            object seguimientoConsolidacion = new
+                            {
+                                id_seguimiento_envio = (int)envio.id_seguimiento_envio,
+                                id_consolidacion = (int)envio.id_consolidacion,
+                                estado_cierre = estadoCierre.ToString()
+                            };
+
+                            // asigna  al seguimiento su estadoCierre
+                            con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
                             WHERE id_seguimiento_envio = @id_seguimiento_envio", seguimientoConsolidacion);
-                        con.Close();
+                            con.Close();
 
-                        listaRes.Add(seguimientoConsolidacion); listaRes.Add(seguimientoConsolidacion);
+                            listaRes.Add(seguimientoConsolidacion);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        procesoExitoso = false;
+                        excepcion = e;
+                        break;
                     }
                 }
-                catch (Exception e)
-                {
-                    procesoExitoso = false;
-                    excepcion = e;
-                    break;
-                }
-            }
 
-            estadoCierre = procesoExitoso ? estadoCierre : consolidacionActiva.estado; //  si no hubo error se cambi al estado Consolidado o cerrado , segun si fue normal o trimestral, caso contrario "consolidacion.estado" vuelve al valor que tenia originalmente
-            this.estadoConsolidacion(id_consolidacion, estadoCierre);
+                string estado_cierre = procesoExitoso ? estadoCierre : "consolidado"; //  si no hubo error se cambi al estado Consolidado o cerrado , segun si fue normal o trimestral, caso contrario "consolidacion.estado" vuelve al valor que tenia originalmente
+                this.estadoConsolidacion(id_consolidacion, estado_cierre, false);
+            }
 
             con.Close();
             conSegSql.Close();
@@ -256,7 +267,7 @@ namespace SVD.Controllers
                 data = new
                 {
                     lista = listaRes,
-                    estadoCierre = estadoCierre
+                    estadoCierre = procesoExitoso ? estadoCierre : "consolidado"
                 }
             };
         }
@@ -304,8 +315,8 @@ namespace SVD.Controllers
             };
         }
 
-        [HttpPost()]
-        public int insertConsolidacion()
+
+        public int insertConsolidacion([FromBody]string observaciones)
         {
             AperturaController aper = new AperturaController();
             dynamic aperturaActiva = aper.getAperturaActiva().data;
@@ -313,28 +324,31 @@ namespace SVD.Controllers
             {
                 fecha_consolidacion = DateTime.Now,
                 fecha_corte = aperturaActiva.fecha_corte,
-                estado = "procesando",
+                estado = "",
+                procesando = true,
+                observaciones = observaciones,
 
                 creado_por = 999,
                 creado_en = DateTime.Now
             };
             int id = con.Query<int>(@"INSERT INTO consolidaciones( fecha_consolidacion,
-                                                        estado, fecha_corte, creado_por, creado_en)
+                                                        estado, fecha_corte, procesando, observaciones, creado_por, creado_en)
                                     VALUES (@fecha_consolidacion,
-                                    @estado, @fecha_corte,  @creado_por, @creado_en) RETURNING id_consolidacion", consolidacion).Single();
+                                    @estado, @fecha_corte,  @procesando, @observaciones,  @creado_por, @creado_en) RETURNING id_consolidacion", consolidacion).Single();
             con.Close();
             return id;
         }
 
         [HttpPut()]
-        public void estadoConsolidacion(int idConsolidacion, string estadoCierre)
+        public void estadoConsolidacion(int idConsolidacion, string estadoCierre, bool procesando)
         {
             object consolidacion = new
             {
                 id_consolidacion = idConsolidacion,
                 estado = estadoCierre,
+                procesando = procesando
             };
-            con.Execute(@"UPDATE consolidaciones SET estado = @estado WHERE id_consolidacion = @id_consolidacion ", consolidacion);
+            con.Execute(@"UPDATE consolidaciones SET estado = @estado, procesando = @procesando WHERE id_consolidacion = @id_consolidacion ", consolidacion);
             con.Close();
         }
 

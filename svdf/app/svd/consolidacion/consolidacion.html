@@ -39,10 +39,10 @@
                         <th>Cod.</th>
                         <th>Entidad</th>
                         <th>Último envío</th>
-                        <th>Estado</th>
+                        <th>E. Validación</th>
                         <th>Observaciones</th>
                         <th>Inf. válida</th>
-                        <th>Estado</th>
+                        <th>E. consolid.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,13 +53,18 @@
                         <td><span class='{{estiloAlert[item.estado]}} badge'>{{item.desc_estado}}</span> </td>
                         <td>{{item.observaciones}} </td>
                         <td><span class='{{item.valido ? "bg-success-dark": "bg-danger-dark"}} badge'>{{item.valido ? 'S':'N'}}</span> </td>
-                        <td><span class='{{item.estado_cierre ? "bg-success-dark fa fa-check": ""}} badge'>   {{item.estado_cierre}}</span> </td>
+                        <td><span class='{{item.estado_cierre ?  "bg-success-dark fa fa-check": ""}} badge'>   {{item.estado_cierre}}</span> </td>
                     </tr>
                 </tbody> 
             </table>
+            <div>
+                <span>Introducir una observación en caso de ser necesaria (por ejemplo si se realiza el cierre parcial solo con algunas entidades), 
+                    <br> ésta información se guardará en la base de datos y los datos del usuario que realiza el cierre.</span>
+                <textarea ng-model="ctxConsolidacion.consolidacion_observaciones" class='form-control' placeholder="Observaciones"></textarea>
+            </div>
             <div class="col-md-6 col-md-offset-3 form-group">
                 <div id="btnConsolidacion" hidden="" class="btnProcesar">
-                    <h5>Al presionar en el botón de consolidación y cierre, solo se procesará la información enviada y válida por cada entidad.</h5> 
+                    <h5>Al presionar en el botón de consolidación y cierre, solo se procesará los envios de las entidades cuya información  sea valida.</h5> 
                     <div class="bg-danger pl5 pt5 bordered" id="msjError1" ng-show="errorEnCierre">
                         <i class="fa fa-2x fa-warning"></i> 
                         <span> Ha sucedido un error durante el proceso de consolidación y cierre. Por favor vuelva a intentarlo, presionando en el botón.</span>

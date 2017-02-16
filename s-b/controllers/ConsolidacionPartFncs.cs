@@ -432,15 +432,15 @@ namespace SVD.Controllers
             if (this.poblarSQLSeguros)
             {
 
-                // 1. ********************** afecta tablas iftIndicadores , iftVariable
-                conSegSql.Execute("svdp_ifpIndicador_CalcularTodo",
-                                new { fInformacion = this.FechaCorteInt, cEmpresa = this.codigoEntidad }, commandTimeout: 120, commandType: CommandType.StoredProcedure);
-                this.paso = 1010;
-                // 2. ******************************       No se realiza
-                // 3. ***********************                      afecta tabla    iftCapitalMinimo
-                conSegSql.Execute("svdp_ifpLLenaCapitalMinimo",
-                new { fInformacion = this.FechaCorteInt, cEmpresa = this.codigoEntidad }, commandType: CommandType.StoredProcedure);
-                this.paso = 1030;
+                // // 1. ********************** afecta tablas iftIndicadores , iftVariable
+                // conSegSql.Execute("svdp_ifpIndicador_CalcularTodo",
+                //                 new { fInformacion = this.FechaCorteInt, cEmpresa = this.codigoEntidad }, commandTimeout: 120, commandType: CommandType.StoredProcedure);
+                // this.paso = 1010;
+                // // 2. ******************************       No se realiza
+                // // 3. ***********************                      afecta tabla    iftCapitalMinimo
+                // conSegSql.Execute("svdp_ifpLLenaCapitalMinimo",
+                // new { fInformacion = this.FechaCorteInt, cEmpresa = this.codigoEntidad }, commandType: CommandType.StoredProcedure);
+                // this.paso = 1030;
                 // 4a. ******************* Calcula margen de solvencia por trimestre  iftMargensolvencia
                 if (this.esMesSolvencia)
                 {
@@ -487,38 +487,49 @@ namespace SVD.Controllers
         {
             if (this.poblarSQLSeguros)
             {
+                // 1.
                 conSegSql.Execute("atpAP_actualizartablas",
                     new { pfecha = this.FechaCorteInt }, commandType: CommandType.StoredProcedure);
                 this.paso = 2010;
 
+                // TODO descomentar cuando este conectada con la base de datos real SQL:
+
+                // // 2.
                 // conSegSql.Execute("atpIICalcularIndicadores",
                 //     new { pfecha = this.FechaCorteInt }, commandTimeout: 90, commandType: CommandType.StoredProcedure);
                 // this.paso = 2020;
 
 
+                // // 3.
                 // conSegSql.Execute("atpRG_CargarIndicadores",
                 //     new { pfechaini = this.FechaCorteInt ,pfechafin = this.FechaCorteInt }, commandTimeout: 90, commandType: CommandType.StoredProcedure);
                 // this.paso = 2030;
 
-
+                // // 4.
                 // conSegSql.Execute("atpCargaTablaHechosSISALT", commandType: CommandType.StoredProcedure);
                 // this.paso = 2040;
 
+                // // 5.
                 // conSegSql.Execute("pSetIndiceVariacionBoletin",
                 //     new { fecha = this.FechaCorteInt}, commandTimeout: 90, commandType: CommandType.StoredProcedure);
                 // this.paso = 2050;
 
+                // 6.
                 conSegSql.Execute("pFillBER_BoletinEstadoResultados",
                     new { fecha = this.FechaCorteInt }, commandTimeout: 300, commandType: CommandType.StoredProcedure);
                 this.paso = 2060;
 
+                // 7.
                 conSegSql.Execute("pFillBER_ModalidadRamo",
                     new { fecha = this.FechaCorteInt }, commandTimeout: 300, commandType: CommandType.StoredProcedure);
                 this.paso = 2070;
 
+                // 8.
                 conSegSql.Execute("pFillDescripcionRamosATR", commandTimeout: 300, commandType: CommandType.StoredProcedure);
                 this.paso = 2080;
 
+
+                // 9.
                 conSegSql.Execute("pFill_PPS_Zeros",
                     new { fecha = this.FechaCorteInt }, commandTimeout: 300, commandType: CommandType.StoredProcedure);
                 this.paso = 2090;

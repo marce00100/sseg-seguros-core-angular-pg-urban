@@ -5,7 +5,7 @@ angular
     .factory('comun', ['$location', '$rootScope', function($location, $rootScope) {
             var fac = {
                 urlBackend: 'http://localhost:5000/svd/api/',
-                arreglaListaValContenido: function(listaValContenido) 
+                arreglaListaValContenido: function(listaValContenido)
                 {
                     for (var i = 0; i < listaValContenido.length; i++)
                     {
@@ -102,6 +102,20 @@ angular
             $rootScope.esNumero = function(valor)
             {
                 return angular.isNumber(valor);
+            }
+
+            $rootScope.mostrarProcesando = function(textoProcesando)
+            {                
+                if(textoProcesando == null)
+                    textoProcesando = " procesando ..."
+                $rootScope.textoProcesando = textoProcesando;
+                angular.element(".mostrarProcesando").show();
+                angular.element(".mostrarCargado").hide();
+            }
+            $rootScope.mostrarContenidoCargado = function()
+            {
+                angular.element(".mostrarProcesando").hide(200);
+                angular.element(".mostrarCargado").show();
             }
 
 

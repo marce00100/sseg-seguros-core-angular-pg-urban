@@ -13,10 +13,11 @@
                 <th>Cod.</th>
                 <th>Entidad</th>
                 <th>Último envío</th>
-                <th>Estado</th>
+                <th>E. Validación</th>
                 <th>Observaciones</th>
                 <th>Inf. válida</th>                
                 <th>N envíos</th>
+                <th>E. consolid.</th>
                 <th>opciones</th>
             </tr>
         </thead>
@@ -30,6 +31,7 @@
                 <td>{{item.observaciones}} </td>
                 <td><span class='{{item.valido ? "bg-success-dark": "bg-danger-dark"}} badge'>{{item.valido ? 'S':'N'}}</span> </td>                
                 <td>{{item.envios.length}} </td>
+                <td><span class='{{item.estado_cierre ? "bg-success-dark fa fa-check": ""}} badge'>   {{item.estado_cierre}}</span> </td>
                 <td>
                     <a href=""  ng-click="muestraEnvios(item, 'envios')" title="Ver envios realizados" class="m10"><i class="fa fa-search fa-lg"></i></a>
                     <a href=""  ng-click="muestraEnvios(item, 'info')"  title="Ver detalle de la informacion"><i class="fa fa-info-circle fa-lg"></i></a>

@@ -26,7 +26,7 @@ namespace SVD.Controllers
                                                 WHERE s.cod_entidad = e.""cEmpresa"" AND a.id_apertura = s.id_apertura 
                                                 AND s.estado = c.codigo AND c.dimension = 'estado_seguimiento'
                                                 AND  a.fecha_corte = " + queryFechaCorte +
-                                                "order by a.id_apertura, s.cod_entidad, s.fecha_envio"));
+                                                "order by s.fecha_envio"));
             con.Close();
             List<dynamic> listaActivos = new List<dynamic>(con.Query<dynamic>(@"SELECT a.id_apertura, a.fecha_corte, e.""tNombre"" as entidad_nombre, s.* , c.nombre as desc_estado
                                                 FROM seguimiento_envios  s, ""rstEmpresas"" e, aperturas a, constantes c
@@ -34,7 +34,7 @@ namespace SVD.Controllers
                                                  AND s.estado = c.codigo AND c.dimension = 'estado_seguimiento'
                                                 AND s.activo
                                                 AND  a.fecha_corte = " + queryFechaCorte +
-                                                "order by a.id_apertura, s.cod_entidad, s.fecha_envio"));
+                                                "order by s.fecha_envio"));
             con.Close();
             foreach (dynamic item in listaActivos)
             {

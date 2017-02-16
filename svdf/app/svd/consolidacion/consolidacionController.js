@@ -66,9 +66,8 @@ angular
                 {
                     $scope.ctxConsolidacion.estado = "procesando";
                     habilitaBotones();
-                    $http.post(comun.urlBackend + 'consolidacion/envios_validos').success(function(res) {
+                    $http.post(comun.urlBackend + 'consolidacion/envios_validos', {observaciones: $scope.ctxConsolidacion.consolidacion_observaciones}).success(function(res) {
                         $scope.errorEnCierre = res.errorEnCierre;
-                        console.log(res.excepcion);
                         var consolidadosLista = res.data.lista;
                         for (i = 0; i < consolidadosLista.length; i++)
                         {
@@ -91,14 +90,13 @@ angular
             $scope.continuarCierre = function()
             {
                 $scope.errorEnCierre2 = null;
-                var opcion = confirm("Confirma que desea realizar la consolidación y cierre de la información enviada ?? ");
+                var opcion = confirm("Confirma que desea realizar el cierre de la información enviada ?? ");
                 if (opcion)
                 {
                     $scope.ctxConsolidacion.estado = "procesando";
                     habilitaBotones();
                     $http.post(comun.urlBackend + 'consolidacion/re_calcular_margen_solvencia', $scope.ctxConsolidados).success(function(res) {
                         $scope.errorEnCierre2 = res.errorEnCierre2;
-                        console.log(res.excepcion);
                         var consolidadosLista = res.data.lista;
                         for (i = 0; i < consolidadosLista.length; i++)
                         {

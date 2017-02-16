@@ -1469,6 +1469,18 @@ namespace SVD.Controllers
         {
             return this.erroresDiccionario.Where(e => e.codigo == cod_error).Select(o => o.descripcion).FirstOrDefault();
         }
+
+        private int estadoValidezDeError(Error errorObj)
+        {
+            int estadoValidez = 4;
+            if (errorObj.error.Substring(0, 2) == "EE")
+                estadoValidez = 1;
+            else if (errorObj.error.Substring(0, 2) == "E-")
+                estadoValidez = 2;
+            else if (errorObj.error.Substring(0, 2) == "A-")
+                estadoValidez = 3;
+            return estadoValidez;
+        }
     }
 
 

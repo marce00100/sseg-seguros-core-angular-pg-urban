@@ -9,7 +9,7 @@ angular
                 });
             }
             CargaEnvios();
-            $scope.$on('actualizar_envios', function(event, data){
+            $scope.$on('actualizar_envios', function(event, data) {
                 CargaEnvios();
             })
 
@@ -36,14 +36,17 @@ angular
                 $rootScope.instanciaModal.dismiss('cancel');
             }
         }])
-    .controller('seguimientoEnviosCtrl', ['$scope', 'objetos', function($scope, objetos)
+    .controller('seguimientoEnviosCtrl', ['$scope', '$rootScope', 'objetos', function($scope, $rootScope, objetos)
         {
             $scope.envEntidad = objetos.envEntidad;
             $scope.subtituloForm = 'Histórico de Envios';// + elem.fecha_corte;
+            $rootScope.mostrarContenidoCargado();
+
         }])
-    .controller('resultadoValidacionEnvioCtrl', ['$scope', 'objetos', '$http', 'comun', function($scope, objetos, $http, comun)
+    .controller('resultadoValidacionEnvioCtrl', ['$scope', '$rootScope', 'objetos', '$http', 'comun', function($scope, $rootScope, objetos, $http, comun)
         {
             $scope.subtituloForm = 'Información Técnica Financiera de archivos enviados';
+            $rootScope.mostrarProcesando();
             $scope.val = {}
             $scope.modValidez = {};
             $scope.entEnvio = objetos.envEntidad;
@@ -67,17 +70,27 @@ angular
 
                     $scope.val.ctxEntidad = res.seguimientoEntidadDatos;
                     $scope.val.ctxApertura = res.aperturaDatos;
+                    var fecha = res.aperturaDatos.fecha_corte.toString().split('-');
+                    $scope.val.ctxApertura.ano = parseInt(fecha[0]);
+                    $scope.val.ctxApertura.mes = parseInt(fecha[1]);
+                    $scope.val.ctxApertura.dia = parseInt(fecha[2].toString().substring(0, 2));//31;//30;
 
                     $scope.val.validoF = res.validoF;
                     $scope.val.erroresF = res.erroresF;
                     if (res.validoF)
                     {
+                        $scope.val.estadoValidez = res.estadoValidez;
+                        $scope.val.estadoValidez_desc = res.estadoValidez_desc;
+
                         $scope.val.validoEF = res.validoEF;
                         $scope.val.datosEF = res.validacionEF;
                         $scope.val.validoC = res.validoC;
                         $scope.val.datosContenido = comun.arreglaListaValContenido(res.datosC);
                     }
-
+                })
+                .finally(function()
+                {
+                    $rootScope.mostrarContenidoCargado();
                 });
 
 //            $http.post(comun.urlBackend + 'validaciones/consulta/reporte', {id_seguimiento_envio: $scope.entEnvio.id_seguimiento_envio}).success(function(res)
