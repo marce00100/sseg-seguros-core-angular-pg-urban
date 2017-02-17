@@ -106,11 +106,16 @@ angular
                                     {
                                         insertBefore: '#load_styles_before',
                                         files: [
+                                            'vendor/chosen_v1.4.0/chosen.min.css',
+                                            'vendor/datatables/media/css/jquery.dataTables.css'
                                         ]
                                     },
                                     {
-                                        name: 'ngFileUpload',
+                                        serie: true,
                                         files: [
+                                            'vendor/chosen_v1.4.0/chosen.jquery.min.js',
+                                            'vendor/datatables/media/js/jquery.dataTables.js',
+                                            'app/common/js/extentions/bootstrap-datatables.js',
                                             'app/svd/control/seguimientoController.js'
                                         ]
                                     }]).then(function() {
@@ -139,6 +144,39 @@ angular
                     }
                 })
 
+                // ///////////////////////////////////////// ENVIOS HISTORICOS           ////////
+                .state('app.svd_historicos', {
+                    url: '/historicos',
+                    templateUrl: 'app/svd/control/historicos.html',
+                    resolve: {
+                        deps: ['$ocLazyLoad', function($ocLazyLoad) {
+
+                                return $ocLazyLoad.load([
+                                    {
+                                        insertBefore: '#load_styles_before',
+                                        files: [
+                                            'vendor/chosen_v1.4.0/chosen.min.css',
+                                            'vendor/datatables/media/css/jquery.dataTables.css'
+                                        ]
+                                    },
+                                    {
+                                        serie: true,
+                                        files: [
+                                            'vendor/chosen_v1.4.0/chosen.jquery.min.js',
+                                            'vendor/datatables/media/js/jquery.dataTables.js',
+                                            'app/common/js/extentions/bootstrap-datatables.js',
+                                            'app/svd/control/seguimientoController.js'
+                                        ]
+                                    }]).then(function() {
+                                    return $ocLazyLoad.load('app/svd/control/historicosController.js');
+                                });
+                            }]
+                    },
+                    controller: 'historicosCtrl',
+                    data: {
+                        title: 'Control de envíos de históricos',
+                    }
+                })
                 // ///////////////////////////////////////// ENTIDADES //////////////////////////////////////////////
                 .state('app.svd_cla_entidades', {
                     url: '/clasificadores/entidades',

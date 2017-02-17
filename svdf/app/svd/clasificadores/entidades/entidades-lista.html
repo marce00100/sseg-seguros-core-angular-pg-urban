@@ -1,5 +1,5 @@
 
-<div class="container">
+<div class="container panel panel-body">
     <h3>Entidades e intermediarios de seguros</h3>
     <span><b>Total: <span class="badge ">{{listaEntidades.length}}</span></b></span>
     <hr>
@@ -10,7 +10,7 @@
                     <div class="row" >
                         <div class='pull-right mb5 '>
                             tipo:
-                            <select class="w300 p5" ng-model="cmbFiltroTiposEntidades" ng-options="item.cTipoEntidad +' ' + item.tDescripcionCorta for item in listaTiposEnts">
+                            <select class="w300 p5" ng-model="cmbFiltroTiposEntidades" ng-options="item.cTipoEntidad + ' ' +  item.tDescripcionCorta for item in listaTiposEnts">
                                 <option value="">- Todos -</option>
                             </select>
                         </div>

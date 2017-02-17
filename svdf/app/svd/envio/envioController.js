@@ -13,7 +13,7 @@ angular
                 var fecha = res.data.fecha_corte.toString().split('-');
                 $scope.ctxApertura.ano = parseInt(fecha[0]);
                 $scope.ctxApertura.mes = parseInt(fecha[1]);
-                $scope.ctxApertura.dia = parseInt(fecha[2].toString().substring(0, 2));//31;//30;
+                $scope.ctxApertura.dia = parseInt(fecha[2].toString().substring(0, 2));
                 $scope.ctxApertura.iniciado ? angular.element('#divIniciado').show(300) : angular.element('#msjDetenido').show(300);
             });
 
@@ -44,7 +44,6 @@ angular
                 $scope.archivosInvalidos = [];
                 $scope.errores = [];
                 ocultarResultados();
-
             }
 
             $scope.validarArchivos = function()
@@ -54,12 +53,12 @@ angular
                 $scope.val = {}
                 $scope.val.ctxApertura = $scope.ctxApertura;
                 ocultarResultados();
-
+                angular.element(".mostrarProcesando").show();
+                $scope.textoProcesando = "procesando ... espere por favor!"
                 ////#################         1ra VALIDACION FORMATO                   #####################################/////////////////////////
                 $http.post(comun.urlBackend + 'validaciones/formato/', {cod_entidad: cod_entidad, archivosCargados: $scope.archivosCargados})
                     .success(function(res)
                     {
-                        $scope.val.muestraResultadosValidacion = true;
                         //obtiene el contexto del seguimiento y entidad y la fecha de envio para la apertura activa
                         $http.get(comun.urlBackend + 'sgmnt/activo/' + cod_entidad).success(function(res) {
                             $scope.val.ctxEntidad = res.data;
@@ -88,8 +87,8 @@ angular
                                 $scope.val.datosContenido = comun.arreglaListaValContenido(res.datosC);
                                 $scope.val.validoEF = res.validoEF;
                                 $scope.val.datosEF = res.datosEF;
-
-
+                                angular.element(".mostrarProcesando").hide();
+                                $scope.val.muestraResultadosValidacion = true;
                             }).error(function() {
                                 ocultarResultados();
                                 angular.element("#errorEnvio").show(200);
@@ -100,10 +99,10 @@ angular
                     angular.element("#errorEnvio").show(200);
                 });
             }
-
             function ocultarResultados()
             {
                 $scope.val.muestraResultadosValidacion = false;
                 angular.element("#errorEnvio").hide();
+                angular.element(".mostrarProcesando").hide();
             }
         }])

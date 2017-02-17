@@ -39,14 +39,12 @@ angular
     .controller('seguimientoEnviosCtrl', ['$scope', '$rootScope', 'objetos', function($scope, $rootScope, objetos)
         {
             $scope.envEntidad = objetos.envEntidad;
-            $scope.subtituloForm = 'Histórico de Envios';// + elem.fecha_corte;
-            $rootScope.mostrarContenidoCargado();
-
+            $scope.subtituloForm = 'Histórico de Envios';
         }])
     .controller('resultadoValidacionEnvioCtrl', ['$scope', '$rootScope', 'objetos', '$http', 'comun', function($scope, $rootScope, objetos, $http, comun)
         {
             $scope.subtituloForm = 'Información Técnica Financiera de archivos enviados';
-            $rootScope.mostrarProcesando();
+            mostrarProcesando();
             $scope.val = {}
             $scope.modValidez = {};
             $scope.entEnvio = objetos.envEntidad;
@@ -90,14 +88,26 @@ angular
                 })
                 .finally(function()
                 {
-                    $rootScope.mostrarContenidoCargado();
+                    mostrarContenidoCargado();
                 });
 
 //            $http.post(comun.urlBackend + 'validaciones/consulta/reporte', {id_seguimiento_envio: $scope.entEnvio.id_seguimiento_envio}).success(function(res)
 //            {});
 
 
-
+            function mostrarProcesando(textoProcesando)
+            {
+                if (textoProcesando == null)
+                    textoProcesando = " procesando ..."
+                $rootScope.textoProcesando = textoProcesando;
+                angular.element(".mostrarProcesando").show();
+                angular.element(".mostrarCargado").hide();
+            }
+            function mostrarContenidoCargado()
+            {
+                angular.element(".mostrarProcesando").hide(200);
+                angular.element(".mostrarCargado").show();
+            }
 
             $scope.mostrarObservaciones = function()
             {

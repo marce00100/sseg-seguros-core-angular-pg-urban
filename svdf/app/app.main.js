@@ -104,19 +104,7 @@ angular
                 return angular.isNumber(valor);
             }
 
-            $rootScope.mostrarProcesando = function(textoProcesando)
-            {                
-                if(textoProcesando == null)
-                    textoProcesando = " procesando ..."
-                $rootScope.textoProcesando = textoProcesando;
-                angular.element(".mostrarProcesando").show();
-                angular.element(".mostrarCargado").hide();
-            }
-            $rootScope.mostrarContenidoCargado = function()
-            {
-                angular.element(".mostrarProcesando").hide(200);
-                angular.element(".mostrarCargado").show();
-            }
+
 
 
 

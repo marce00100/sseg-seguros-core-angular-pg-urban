@@ -45,6 +45,40 @@ namespace SVD.Controllers
             };
         }
 
+        [HttpGet("ultima_de_fecha_corte/{mes}/{ano}")]
+        public dynamic getAperturaFechaCorte(int mes, int ano)
+        {
+            dynamic seg = con.Query<dynamic>(@"SELECT a.id_apertura, a.fecha_corte, a.iniciado, a.fecha_inicio_envios, a.fecha_detiene_envios,
+                                                    a.estado, a.activo, a.factor_tc, conf.id_configuracion, conf.usa_factor_tc, conf.moneda_factor_tc, conf.margen_partes_ef,
+                                                    conf.margen_validacion_soat,
+                                                    c.""mCompra"", c.""mVenta"", ""mEuroBS"", ""mUFV""
+                                                FROM aperturas a, ""cmtTipoCambio"" c, configuraciones conf
+                                                WHERE
+                                                a.id_apertura = (select  MAX(id_apertura)
+                                    from aperturas where extract(year from fecha_corte) = @ano and extract(month from fecha_corte) = @mes)
+                                                AND c.""fTipoCambio"" = a.fecha_corte
+                                                AND a.id_configuracion = conf.id_configuracion", new { mes = mes, ano = ano }).FirstOrDefault();
+            con.Close();
+            if (seg != null) 
+            {
+                seg.dia_control = seg.fecha_corte.Day;
+                seg.mes_control = seg.fecha_corte.Month;
+                seg.ano_control = seg.fecha_corte.Year;
+                seg.dia_actual = DateTime.Now.Day.ToString();
+                seg.mes_actual = DateTime.Now.Month.ToString();
+                seg.ano_actual = DateTime.Now.Year.ToString();
+            }
+            return new
+            {
+                status = "success",
+                mensaje = "encontrado",
+                codigo = "200",
+                data = seg
+            };
+        }
+
+
+
         public static dynamic getAperturaDeSeguimiento(int id_seguimiento)
         {
             dynamic aper = con.Query<dynamic>(@"SELECT a.id_apertura, a.fecha_corte, a.iniciado, a.fecha_inicio_envios, a.fecha_detiene_envios,
@@ -130,6 +164,19 @@ namespace SVD.Controllers
                 mensaje = "modificado",
                 codigo = "200",
                 data = obj
+            };
+        }
+
+
+        [HttpGet("anosAperturas")]
+        public object obtieneAnosAperturas()
+        {
+            List<int> anos = new List<int>(con.Query<int>("select distinct extract( year from fecha_corte) as ano from aperturas order by ano desc"));
+            con.Close();
+            return new
+            {
+                status = "success",
+                data = anos
             };
         }
     }
