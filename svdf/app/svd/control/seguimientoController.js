@@ -2,15 +2,17 @@ angular
     .module('ApsApp')
     .controller('seguimientoCtrl', ['$scope', 'comun', '$rootScope', '$http', '$uibModal', function($scope, comun, $rootScope, $http, $uibModal)
         {
-            CargaEnvios = function()
+            CargaEnvios = function(apiEnvio)
             {
-                $http.get(comun.urlBackend + 'sgmnt/envios/apertura_activa').success(function(res) {
+                var api = 'sgmnt/envios/' + ((apiEnvio == '') ? 'apertura_activa' : apiEnvio);
+                console.log(api);
+                $http.get(comun.urlBackend + api).success(function(res) {
                     $scope.listaSeguimiento = res.data;
                 });
             }
-            CargaEnvios();
-            $scope.$on('actualizar_envios', function(event, data) {
-                CargaEnvios();
+//            CargaEnvios();
+            $scope.$on('actualizar_envios', function(event, apiEnvio) {
+                CargaEnvios(apiEnvio);
             })
 
             $scope.muestraEnvios = function(elem, form)

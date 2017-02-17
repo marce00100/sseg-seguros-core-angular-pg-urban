@@ -18,7 +18,7 @@ namespace SVD.Controllers
         // puede ser   envios/2016-03-31    o    envios/apertura_activa  
         public dynamic getSeguimientoEntidades(string aperActiva_fCorte)
         {
-            string queryFechaCorte = aperActiva_fCorte == "apertura_activa" ? "(SELECT fecha_corte FROM aperturas WHERE activo)" : aperActiva_fCorte;
+            string queryFechaCorte = aperActiva_fCorte == "apertura_activa" ? "(SELECT fecha_corte FROM aperturas WHERE activo)" : "'" + aperActiva_fCorte + "'";
             //obtiene todos los envios de todas las entidades para una fecha de corte (o apertura_actual)
 
             List<dynamic> lista = new List<dynamic>(con.Query<dynamic>(@"SELECT a.id_apertura, a.fecha_corte, e.""tNombre"" as entidad_nombre, s.* , c.nombre as desc_estado
@@ -149,11 +149,11 @@ namespace SVD.Controllers
                                                                 WHERE activo AND id_seguimiento_envio = @id ", new { id = (Int32)obj.id_seguimiento_envio }).FirstOrDefault();
             con.Close();
             seg.observaciones = obj.observaciones;
-            seg.valido = obj.valido;            
+            seg.valido = obj.valido;
             seg.modificado_por = 999;
             seg.modificado_en = DateTime.Now;
 
-            if(!seg.valido)
+            if (!seg.valido)
             {
                 seg.id_consolidacion = null;
                 seg.estado_cierre = null;

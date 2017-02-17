@@ -42,6 +42,7 @@ angular
                 $scope.cot.dia = fechaCorte.getDate();
                 $scope.cot.dia_semana = fechaCorte.getDay();
                 $scope.buscafechaCotizaciones();
+                $scope.$broadcast('actualizar_envios', '');
             });
 
 
@@ -71,7 +72,7 @@ angular
                             .success(function(resp) {
                                 $http.get(comun.urlBackend + 'apertura/activo').success(function(res) {
                                     $scope.aper = res.data;
-                                    $scope.$broadcast('actualizar_envios', 1);
+                                    $scope.$broadcast('actualizar_envios', '');
                                 })
                             })
                     }
@@ -81,7 +82,7 @@ angular
                             .success(function(resp) {
                                 $http.get(comun.urlBackend + 'apertura/activo').success(function(res) {
                                     $scope.aper = res.data;
-                                    $scope.$broadcast('actualizar_envios', 1);
+                                    $scope.$broadcast('actualizar_envios', '');
                                 })
                             })
                     }
