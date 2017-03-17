@@ -1,0 +1,88 @@
+
+<div class="container panel panel-body">
+    <h3>Panel de control de validaciones y envíos</h3>
+    <div class="panel panel-default panel-body">
+        <h5 class="bold"><i class="fa fa-calendar-o"></i> Fecha Actual: <span >{{aper.dia_actual + ' / ' + aper.mes_actual + ' / ' + aper.ano_actual}} </span></h5>
+        <div>Antes de realizar la apertura e iniciar el envío  de archivos, verifique los tipos de cambio, y la fecha de corte. </div>
+        <div class="panel panel-bordered border-default p10">
+            <div id="msjNoCotizacion"  class='bg-danger-dark p5 round' hidden=""> <!-- ng-show='cot.cotizacion == null' > -->
+                <span class="bold p2"><i class="fa fa-warning fa fa-2x" ></i> No existen los tipos de cambio para la fecha de corte, se deben configurar los tipos de cambio primero, para dar inicio </span>
+            </div>
+            <div  class='bg-warning-dark p5 round ' ng-show='aper.mensajeError'>
+                <span>{{aper.mensajeError}} </span>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <h4>Fecha de corte:</h4>
+                    <!--<span class="help-block">Último día hábil del mes a fiscalizar</span>-->
+                </div>
+                <div class='col-md-9'> 
+                    <div class=" form-group col-md-2 bold ">
+                        D: {{dias[cot.dia_semana]}} 
+                        <input type="number" ng-model="cot.dia" class="form-control" min="1" max="31" ng-change="buscafechaCotizaciones()">
+                    </div>
+                    <div class=" form-group col-md-2 bold ">
+                        M: {{meses[cot.mes]}}
+                        <input  ng-model="cot.mes" class="form-control " min="1" max="12" ng-change="buscafechaCotizaciones()">
+                    </div>
+                    <div class=" form-group col-md-2 bold ">
+                        Año: 
+                        <input  ng-model="cot.ano" class="form-control " min="1980" max="2040" ng-change="buscafechaCotizaciones()">
+                    </div> 
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3" >
+                    <h4>Cotizaciones al {{cot.dia+"/"+cot.mes+"/"+cot.ano}}: </h4>
+                    <a ui-sref="app.svd_cla_cotizaciones" >
+                        <i class='fa fa-pencil'></i>
+                        <span>Editar Cotizaciones</span>
+                    </a>
+                </div>
+                <div class="col-sm-9 bold">
+                    <div class="col-sm-1" >
+                        <div><span class="label {{cot.cotizacion.mCompra==null?'label-danger':'label-default'}}" style="width: 200px">USD c</span></div>
+                        <div>{{cot.cotizacion.mCompra}}</div>
+                    </div>
+                    <div class="col-sm-1">
+                        <div><span class="label {{cot.cotizacion.mVenta==null?'label-danger':'label-default'}} " style="width: 200px">USD v</span></div>
+                        <div>{{cot.cotizacion.mVenta}}</div>
+                    </div>
+                    <div class="col-sm-1" >
+                        <div><span class="label {{cot.cotizacion.mEuroBS==null?'label-danger':'label-default'}} " style="width: 200px">EUR</span></div>
+                        <div>{{cot.cotizacion.mEuroBS}}</div>
+                    </div>
+                    <div class="col-sm-1">
+                        <div><span class="label {{cot.cotizacion.mUFV==null?'label-danger':'label-default'}} " style="width: 200px">UFV</span></div>
+                        <div>{{cot.cotizacion.mUFV}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <fieldset class="row {{aper.iniciado? 'bg-success-light':'bg-primary-light'}}  p5 " ng-disabled="cot.cotizacion == null" style="border-radius: 10px">
+
+            <div class="col-sm-offset-3 col-sm-6  {{aper.iniciado? 'bg-success-dark':'bg-primary-dark'}} pl25 pt10" style="border-radius: 10px">
+                <div class="col-sm-3">
+                    <label class="switch switch-lg  ">
+                        <input checked=""  type="checkbox" ng-model='aper.iniciado' ng-change="iniciar_detener()">
+                        <span> <i class="handle"></i></span>
+                    </label> 
+                </div>
+                <div class="col-sm-9">
+                    <label class="mb10" style="font-size: 18px; padding-bottom: 10px" > {{aper.iniciado? 'Detener el envío de archivos?':'Iniciar con el envío de archivos?' }} </label>
+                </div>
+            </div>
+            <div class="col-sm-3 text-white text-right " style="border-radius: 10px">
+                <div class="bold">Estado apertura: {{aper.estado| uppercase}}</div>
+                <div>F. inicio apertura: {{aper.fecha_inicio_envios| date : 'dd/MM/yyyy'}}</div>
+                <div>F. detiene apertura: {{aper.fecha_detiene_envios| date : 'dd/MM/yyyy'}}</div>
+            </div>
+        </fieldset>
+        <hr>
+    </div> 
+    <div ng-include="'app/svd/control/seguimiento.html'"></div>
+</div>
+
+

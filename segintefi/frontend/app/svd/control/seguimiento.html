@@ -1,0 +1,44 @@
+<div ng-controller="seguimientoCtrl">
+    <div class="bold">
+        <span class=" ml5 mr5">Envios: <span class="bold badge bg-dark-dark" style="font-size: 13px">{{listaSeguimiento.length}}</span>  </span>
+        <span class=" ml5 mr5">Periodo de fiscalización:  <span class="bold badge bg-dark-dark" style="font-size: 13px">{{meses[aper.mes_control] + " " + aper.ano_control}}
+                ({{aper.fecha_corte| date: 'dd/MM/yyyy'}}) </span> </span>
+        <span class=" ml5 mr5">Estado de apertura: <span  class="bold badge bg-dark-dark" style="font-size: 13px">{{aper.estado}}</span></span>
+    </div>
+
+    <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25 datatable" > <!-- ui-jq="dataTable" ui-options="listaSeguimiento"> -->
+        <thead class='{{estilo.tableHead}}'>
+            <tr>
+                <th>Apertura</th>
+                <th>Cod.</th>
+                <th>Entidad</th>
+                <th>Último envío</th>
+                <th>E. Validación</th>
+                <th>Observaciones</th>
+                <th>Inf. válida</th>                
+                <th>N envíos</th>
+                <th>E. consolid.</th>
+                <th>opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="item in listaSeguimiento">
+                <td>{{ item.id_apertura}}</td>
+                <td>{{item.cod_entidad}}</td>
+                <td>{{item.entidad_nombre}}</td>
+                <td>{{item.fecha_envio| date : 'dd/MM/yyyy - hh:mm'}}</td>
+                <td><span class='{{estiloAlert[item.estado]}} badge'>{{item.desc_estado}}</span> </td>
+                <td>{{item.observaciones}} </td>
+                <td><span class='{{item.valido ? "bg-success-dark": "bg-danger-dark"}} badge'>{{item.valido ? 'S':'N'}}</span> </td>                
+                <td>{{item.envios.length}} </td>
+                <td><span class='{{item.estado_cierre ? "bg-success-dark fa fa-check": ""}} badge'>   {{item.estado_cierre}}</span> </td>
+                <td>
+                    <a href=""  ng-click="muestraEnvios(item, 'envios')" title="Ver envios realizados" class="m10"><i class="fa fa-search fa-lg"></i></a>
+                    <a href=""  ng-click="muestraEnvios(item, 'info')"  title="Ver detalle de la informacion"><i class="fa fa-info-circle fa-lg"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+

@@ -1,0 +1,49 @@
+<!--<div class="modal fade" >-->
+<!--<div class="modal-dialog">-->
+
+<!-- Modal content-->
+<!--<div class="modal-content">-->
+<div class="modal-header {{estilo.modalTitle}}">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class="{{estilo.modalTitle}} modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div class="modal-body">
+    <div id="mensajeErr" class='bg-danger p5 bold pl15 mb10' hidden="" >
+        <i class='fa fa-times-circle fa-lg '></i> 
+        <span ng-bind="mensajeErr"> </span>
+    </div>
+
+    <div class=" form-horizontal pr20"> 
+        <div class='form-group'>
+            <label  class="control-label col-md-2"><b>Modalidad: </b></label>
+            <select style='width: 300px' class="form-control" ng-model="contexto.cModalidad" ng-options="item.cModalidad as item.cModalidad +     ' ' +      item.tDescripcion  for item in listaMods" ng-disabled="contexto.disabled">
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="codigo"  class="control-label col-md-2">Codigo Ramo: </label>
+            <div class="col-md-3">
+                <input type="text" id="codigo" class="form-control"  ng-model="contexto.cRamo" ng-disabled="contexto.disabled" placeholder="Código" >
+            </div>
+        </div>     
+        <div class="form-group">
+            <label for="nombre"  class="control-label col-md-2">Nombre Ramo: </label>
+            <div class="col-md-10">
+                <input type="text" id="nombre" class="form-control"   ng-model="contexto.tDescripcion" placeholder="Nombre">                 
+            </div>
+        </div>  
+        <div class="form-group">
+            <label for="sigla"  class="control-label col-md-2">Id boletin: </label>
+            <div class="col-md-3">
+                <input type="text" id="sigla" class="form-control"    ng-model="contexto.idBoletin" placeholder="boletin" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sigla"  class="control-label col-md-2">Sigla: </label>
+            <div class="col-md-3">
+                <input type="text" id="sigla" class="form-control"    ng-model="contexto.tSigla" placeholder="Sigla" >
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-include= "'app/svd/comunes/modalFooter.html'"></div>

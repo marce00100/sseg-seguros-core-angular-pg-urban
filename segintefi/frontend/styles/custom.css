@@ -1,0 +1,38 @@
+body {background: #FFFFFF;}
+.treasure-overlay-spinner-container {z-index: 100000;}
+.treasure-overlay-spinner-content{height: 100%;}
+.sort-icon {font-size: 9px; margin-left: 5px;}
+th {cursor:pointer;}
+
+/* styles for passwordStrength directive: begin */
+.strong   { color: #060; border-color: #0F0;}
+.medium   { color: #C60; border-color: #FC0;}
+.weak     { color: #900; border-color: #F00;}
+.strength { padding: 1px 10px; border: 2px solid; color: #FFF;}
+/* end: styles for passwordStrength directive */
+
+/* styles for angular-material */
+.md-dialog-container {z-index: 90000}
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar){background-color: #495469;}
+.md-datepicker-calendar-pane{z-index:90001;}
+md-dialog{min-width: 500px;}
+.md-dialog-content .chosen-container{width: 90% !important;}
+.md-dialog-content .layout-row {min-height: 45px;}
+.md-content.md-default-theme, md-content {background-color: #FFFFFF;}
+/* end: styles for angular-material */
+
+.alert-container{position: fixed; z-index: 90001; right: 0; left: 0; margin-right: auto; margin-left: auto; margin-top: 100px; min-height: 10em; width: 80%;}
+.trcolor { background-color:#40B3D9; }
+
+/* styles for passwordStrength directive: begin */
+.locked{ background: #F1564D; color: #F2DEDE; font-weight: bold;}
+.high{ background: #F2DEDE; color: #a94442;}
+.medium{ background: #FCF8E3; color: #8a6d3b;}
+.low{ background: #D9EDF7; color: #31708f;}
+/* end: styles for passwordStrength directive */
+
+/*.md-select {display: flex; margin: 2px 0 6px;}*/
+.md-select-100 {display: flex; margin: 2px 0 6px; width: 100px;}
+.md-select-40p {margin: 2px 0 6px; width: 40%;}
+.md-select-60p {margin: 2px 0 6px; width: 60%;}
+.md-select-80p {margin: 2px 0 6px; width: 80%;}

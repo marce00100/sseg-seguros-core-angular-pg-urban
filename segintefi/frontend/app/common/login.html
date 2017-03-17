@@ -1,0 +1,21 @@
+
+<div class="center-wrapper">
+  <div class="center-content">
+    <div class="row no-margin">
+      <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+        <form name="form" class="form-layout" ng-submit="vm.login()" role="form">
+          <div class="text-center mb15">
+            <img data-ng-src="styles/images/logoaps.png" />
+          </div>
+          <p class="text-center mb30">Bienvenido a {{app.name}}. Por favor ingrese su nombre de usuario y contraseña</p>
+          <div class="form-inputs">
+            <input type="text" class="form-control input-lg" text="usuario" placeholder="Email Address" ng-model="vm.username">
+            <input type="password" class="form-control input-lg" password="password" placeholder="Password" ng-model="vm.password">
+          </div>
+          <button type="submit" ng-disabled="form.$invalid || vm.dataLoading" class="btn btn-primary">Login</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

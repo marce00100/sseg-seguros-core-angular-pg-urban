@@ -1,0 +1,51 @@
+
+<div class="container panel panel-body">
+    <h3>Modalidades</h3>
+    <span><b>Total: <span class="badge ">{{lista.length}}</span></b></span>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10">
+            <div ng-show="lista" >
+                <div>
+
+                    <div class="row">
+                        <div class="col-md-1">
+                            <button class="btn btn-success btn-icon" ng-click="muestraForm()"> 
+                                <i class="fa fa-plus"></i>
+                                <span> Agregar</span>
+                            </button>
+                        </div>
+                        <div class=' pull-right'>
+                            <span>búsqueda: <input type="text" ng-model="txtFiltroBusqueda" style="width: 300px"></span>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25">
+                    <thead ng-class="estilo.tableHead">
+                        <tr>                            
+                            <th>N°</th>
+                            <th>Código</th>                                                       
+                            <th>Modalidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in lista| filter: txtFiltroBusqueda | orderBy: ['cModalidad']">
+                            <td>{{$index + 1}}</td>
+                            <td><b><span ng-bind="item.cModalidad"></span></b></td>
+                            <td><a href="" ng-click="muestraForm(item)"><b> <span ng-bind="item.tDescripcion"></span></b></a></td>
+                            <td>
+                                <a href=""  ng-click="muestraForm(item)" class="glyphicon glyphicon-pencil" title="editar"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+

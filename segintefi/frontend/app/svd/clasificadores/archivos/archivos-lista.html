@@ -1,0 +1,59 @@
+<div class="container panel panel-body panel-bordered">
+    <h4>Gestión de archivos que son enviados por las entidades</h4>
+    <span><b>Total: <span class="badge">{{listaArchivos.length}}</span></b></span>
+    <hr>
+    <div class="row">
+
+        <div class="col-sm-9">
+            <div ng-show="listaArchivos" style="margin-top: 40px ">
+                <div class="row">
+                    <div class="col-md-1">
+                        <button class="btn btn-success btn-icon" ng-click="muestraForm()"> 
+                            <i class="fa fa-plus"></i>
+                            <span> Agregar</span>
+                        </button>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25">
+                    <thead ng-class="estilo.tableHead">
+                        <tr>
+                            <th></th>
+                            <th>Cod.</th>
+                            <th>Nombre</th>                            
+                            <th>Descripcion</th>
+                            <th>Periodos de envio</th>
+                            <th>Tipos de entidad</th>
+                            <th>Validacion</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in listaArchivos| orderBy: ['codigo']">
+                            <td>{{$index + 1}}</td>
+                            <td><b><span ng-bind="item.codigo"></span></b></td>
+                            <td><a href="" ng-click="muestraForm(item)"><b> <span ng-bind="item.nombre"></span></b></a></td>
+                            <td><span ng-bind="item.descripcion"></span></td>
+                            <td><span ng-bind="item.periodos_envio.substring(1, item.periodos_envio.length - 1).split('||').join(', ')" ></span></td>
+                            <td><span ng-bind="item.cods_tipo_entidad.substring(1, item.cods_tipo_entidad.length - 1).split('||').join(', ')" ></span></td>                            
+                            <td><span ng-bind="item.validacion.substring(0, 60) + '...'" ></span></td>
+                            <td>
+                                <label class="switch switch-sm">
+                                    <input type="checkbox" id="someSwitchOptionSuccess" name="someSwitchOption001" ng-model="item.activo" disabled="" />
+                                    <span><i class="handle"></i></span>
+                                </label>
+                            </td>
+                            <td>
+                                <a href=""  ng-click="muestraForm(item)" class="m5" title="editar"><i class='fa fa-lg fa-pencil'></i></a>
+                                <a href="" ng-click="eliminar(item)" class="m5" title="eliminar"><i class="fa fa-lg fa-trash-o" title="eliminar"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+

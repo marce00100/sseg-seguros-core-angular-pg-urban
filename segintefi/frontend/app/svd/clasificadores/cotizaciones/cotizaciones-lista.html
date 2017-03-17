@@ -1,0 +1,51 @@
+<div class="container-fluid panel panel-body">
+    <div class="row">
+        <div class="col-md-9">
+            <div ng-show="listaUltimasCots" style="margin-top: 40px ">
+                <h5>Ultimas <span class="badge">{{listaUltimasCots.length}}</span>  cotizaciones.</h5>
+                <div class="row">
+                    <div class="col-md-1">
+                        <button class="btn btn-success btn-icon" ng-click="muestraForm()"> 
+                            <i class="fa fa-plus"></i>
+                            <span> Agregar</span></button>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25">
+                    <thead class="{{estilo.tableHead}}">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>U$ compra</th>                            
+                            <th>U$ venta</th>
+                            <th>EUR Bs.</th>
+                            <th>EUR DA.</th>
+                            <th>UFV</th>                                
+                            <th>DEG</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in listaUltimasCots| orderBy: [-'fTipoCambio'] ">
+                            <td><b><span>{{item.fTipoCambio| date:'dd/MM/yyyy'}}</span></b></td>
+                            <td><b> <span ng-bind="item.mCompra"></span></b></td>
+                            <td><span ng-bind="item.mVenta"></span></td>
+                            <td><span ng-bind="item.mEuroBS"   style="padding: 0 10px" ></span></td> 
+                            <td><span ng-bind="item.mEuroDA"   style="padding: 0 10px" ></span></td> 
+                            <td><span ng-bind="item.mUFV"   style="padding: 0 10px" ></span></td> 
+                            <td><span style="padding: 0 10px" >{{item.mDEG}}</span></td> 
+                            <td>
+                                <a href=""  ng-click="muestraForm(item)" class="fa fa-pencil ml10" title="editar"></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+

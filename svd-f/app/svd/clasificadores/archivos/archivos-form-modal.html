@@ -1,0 +1,62 @@
+<!--<div class="modal fade" >-->
+<!--<div class="modal-dialog">-->
+
+<!-- Modal content-->
+<!--<div class="modal-content">-->
+<div class="modal-header {{estilo.modalTitle}}">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class="{{estilo.modalTitle}} modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div class="modal-body">
+    <div class=" form-horizontal" style="padding-right: 20px"> 
+        <div class="form-group">
+            <label class="control-label col-md-2">Codigo:</label>
+            <div class="col-md-3">
+                <input type="text" id="codigo" ng-model="contexto.codigo" class="form-control" placeholder="Código" ng-disabled="contexto.id_archivo > 0" >                 
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="nombre" class="control-label col-md-2">Nombre:</label>
+            <div class="col-md-10">
+                <input type="text" id="nombre" ng-model="contexto.nombre" class="form-control" placeholder="Nombre">                 
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="descripcion" class="control-label col-md-2">Descripcion: </label>
+            <div class="col-md-10">
+                <input type="text" id="descripcion"  ng-model="contexto.descripcion"  class="form-control" placeholder="Descripción">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="periodos_envio"  class="control-label col-md-2">Periodos de envío: </label>
+            <div class="col-md-10">
+                <input type="text" id="periodos_envio"  ng-model="contexto.periodos_envio"  class="form-control" placeholder="meses">
+                <p class="help-block">Colocar el numero del mes encerrado en ||. Ej |1||2|</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="cods_tipo_entidad" class="control-label col-md-2">Aplicable a tipos de entidad:  </label>
+            <div class="col-md-10">
+                <input type="text" id="cods_tipo_entidad"  ng-model="contexto.cods_tipo_entidad"  class="form-control" placeholder="Tipos de entidad">
+                <p class="help-block">Colocar los código de los tipos de entidades que haran uso de este archivo, encerrado en ||. Ej |2||12|</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="validacion" class="control-label col-md-2">Validación:  </label>
+            <div class="col-md-10">
+                <textarea id="validacion"  ng-model="contexto.validacion" class="form-control" placeholder="Validación"></textarea>
+            </div>
+        </div>
+
+        <label class="control-label col-md-2">Activo:  </label>
+        <div class="material-switch pull-left col-md-10"  >
+            <label class="switch switch-sm">
+                <input type="checkbox" id="someSwitchOptionSuccess"  ng-model="contexto.activo" />
+                <span><i class="handle"></i></span>
+            </label>
+        </div>
+        <br>
+    </div>
+</div>
+<div ng-include= "'app/svd/comunes/modalFooter.html'"></div>
+

@@ -1,0 +1,77 @@
+
+<div class="container panel panel-body">
+    <h3>Periodo que se desea revisar</h3>
+    <div class="row">
+        <div class="col-md-offset-2 text-center">
+            <div class="form-group-lg fa-lg col-md-3 bold ">
+                M: {{meses[mesApertura]}}
+                <select  ng-model="mesApertura" ng-options="item for item in mesesApertura">
+                </select>
+            </div>
+            <div class=" form-group-lg fa-lg col-md-2  bold ">
+                Año: 
+                <select  ng-model="anoApertura" ng-options="item for item in anosApertura">
+                </select>
+            </div> 
+            <div class=" col-md-6"></div>
+        </div>
+    </div>
+
+    <div class="row mt10">
+        <div class="col-md-offset-2">
+            <button  class="button btn btn-success col-md-5" ng-click="buscarApertura()"><i class="fa fa-search"> </i> <span> Buscar</span></button>
+        </div>
+    </div>
+
+
+    <div class="panel panel-bordered border-default p10 mt15">
+        <div class="row">
+            <div class="col-md-3">
+                <h4>Fecha de corte:</h4>
+                <!--<span class="help-block">Último día hábil del mes a fiscalizar</span>-->
+            </div>
+            <div class='col-md-9'> 
+                <div class=" form-group col-md-2 bold ">
+                    D: {{dias[cot.dia_semana]}} 
+                    <input ng-model="cot.dia" class="form-control " disabled=""   >
+                </div>
+                <div class=" form-group col-md-2 bold ">
+                    M: {{meses[cot.mes]}}
+                    <input  ng-model="cot.mes" class="form-control "  disabled="">
+                </div>
+                <div class=" form-group col-md-2 bold ">
+                    Año: 
+                    <input  ng-model="cot.ano" class="form-control " disabled="" >
+                </div> 
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3" >
+                <h4>Cotizaciones al {{cot.dia + "/" + cot.mes + "/" + cot.ano}}: </h4>
+            </div>
+            <div class="col-sm-9 bold">
+                <div class="col-sm-1" >
+                    <div><span class="label {{cot.cotizacion.mCompra==null?'label-danger':'label-default'}}" style="width: 200px">USD c</span></div>
+                    <div>{{cot.cotizacion.mCompra}}</div>
+                </div>
+                <div class="col-sm-1">
+                    <div><span class="label {{cot.cotizacion.mVenta==null?'label-danger':'label-default'}} " style="width: 200px">USD v</span></div>
+                    <div>{{cot.cotizacion.mVenta}}</div>
+                </div>
+                <div class="col-sm-1" >
+                    <div><span class="label {{cot.cotizacion.mEuroBS==null?'label-danger':'label-default'}} " style="width: 200px">EUR</span></div>
+                    <div>{{cot.cotizacion.mEuroBS}}</div>
+                </div>
+                <div class="col-sm-1">
+                    <div><span class="label {{cot.cotizacion.mUFV==null?'label-danger':'label-default'}} " style="width: 200px">UFV</span></div>
+                    <div>{{cot.cotizacion.mUFV}}</div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <hr>
+    <div ng-include="'app/svd/control/seguimiento.html'"></div>
+</div>
+
+

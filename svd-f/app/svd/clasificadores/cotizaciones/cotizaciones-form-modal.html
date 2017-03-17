@@ -1,0 +1,58 @@
+<!--<div class='form-group'class="modal fade" >-->
+<!--<div class='form-group'class="modal-dialog">-->
+
+<!-- Modal content-->
+<!--<div class='form-group'class="modal-content">-->
+<div class="modal-header {{estilo.modalTitle}}" >
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class="{{estilo.modalTitle}} modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div  class="modal-body">
+    <div class=" form-horizontal" style="padding-right: 20px"> 
+        <div class='form-group'>
+            <label  class="control-label col-md-4">Fecha (dd/mm/aaaa): </label>
+            <div class="col-md-3">                    
+                <input type="text" id="idfecha" ng-model="contexto.fTipoCambio" class="form-control" placeholder="dd/mm/aaaa" ng-disabled="contexto.disabledFecha"> 
+            </div>
+        </div >   
+        <hr>
+        <div class='form-group'>
+            <label  class="control-label col-md-4">US$ Compra: </label>
+            <div class="col-md-3">
+                <input type="text" ng-model="contexto.mCompra" class="form-control" placeholder="0.00">                 
+            </div>
+        </div >  
+        <div class='form-group'>
+            <label  class="control-label col-md-4">US$ Venta: </label>
+            <div class="col-md-3">
+                <input type="text"  ng-model="contexto.mVenta" class="form-control" placeholder="0.00" >
+            </div>
+        </div >
+        <div class='form-group'>
+            <label  class="control-label col-md-4">EURO BS: </label>
+            <div class="col-md-3">
+                <input type="text" ng-model="contexto.mEuroBS" class="form-control" placeholder="0.00">                 
+            </div>
+        </div >  
+        <div class='form-group'>
+            <label  class="control-label col-md-4">EURO DA: </label>
+            <div class="col-md-3">
+                <input type="text" ng-model="contexto.mEuroDA" class="form-control" placeholder="0.00">                 
+            </div>
+        </div >
+        <div class='form-group'>
+            <label  class="control-label col-md-4">UFV: </label>
+            <div class="col-md-3">
+                <input type="text"  ng-model="contexto.mUFV" class="form-control" placeholder="0.00">
+            </div>
+        </div >
+        <div class='form-group'>
+            <label  class="control-label col-md-4">DEG: </label>
+            <div class="col-md-3">
+                <input type="text"  ng-model="contexto.mDEG" class="form-control"  placeholder="0.00">
+            </div>
+        </div>
+    </div>
+</div>  
+<div class='form-group'ng-include= "'app/svd/comunes/modalFooter.html'"></div>
+

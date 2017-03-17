@@ -1,0 +1,41 @@
+<div class="modal-header {{estilo.modalTitle}}">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class=" modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div class="modal-body">
+    <div>
+        <div class='bold'>
+            <h5>Entidad: {{envEntidad.cod_entidad}} {{envEntidad.entidad_nombre}}</h5>
+            <p>Periodo de fiscalización: {{meses[envEntidad.fecha_corte.substr(5,2)]}} {{envEntidad.fecha_corte| date :  'yyyy'}}</p>
+            <p>Fecha de corte: {{envEntidad.fecha_corte|date:'dd/MM/yyyy' }} - Estado de apertura: {{envEntidad.estadoApertura}}</p>
+        </div>
+        <table class="table table-bordered table-rounded table-condensed responsive mb25">
+            <thead class='{{estilo.tableHead}}'>
+                <tr>
+                    <th>Apertura</th>
+                    <th>Fecha de envió</th>
+                    <th>Estado</th>
+                    <th>Activo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-class="{{item.activo}}?'bg-success-light':'' " ng-repeat="item in envEntidad.envios">
+                    <td>{{ item.id_apertura}}</td>
+                    <td>{{item.fecha_envio| date: 'dd/MM/yyyy  hh:mm'}}</td>
+                    <td><span class='{{estiloAlert[item.estado]}} badge' >{{item.desc_estado}}</span></td>
+                    <td>{{item.activo?'SI':'NO'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <!--    <button ng-click="guardar()" class="btn btn-primary mr10"> 
+            <i class="fa fa-check"></i>
+            <span> Guardar</span>
+        </button> -->
+    <button ng-click="cancelar()" class="btn btn-primary "> 
+        <i class="fa fa-times"></i>
+        <span> Cerrar</span>
+    </button>
+</div>

@@ -1,0 +1,79 @@
+
+<div class="container panel panel-body">
+    <h3>Entidades e intermediarios de seguros</h3>
+    <span><b>Total: <span class="badge ">{{listaEntidades.length}}</span></b></span>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10">
+            <div ng-show="listaEntidades" >
+                <div>
+                    <div class="row" >
+                        <div class='pull-right mb5 '>
+                            tipo:
+                            <select class="w300 p5" ng-model="cmbFiltroTiposEntidades" ng-options="item.cTipoEntidad + ' ' +  item.tDescripcionCorta for item in listaTiposEnts">
+                                <option value="">- Todos -</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" >
+                        <div class='pull-right mb5 '>
+                            Activos:
+                            <select class="w300 p5" ng-model="cmbFiltroActivos" >
+                                <option value="">- Todos -</option>
+                                <option value="S">Activos</option>
+                                <option value="N">Inactivos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <button class="btn btn-success btn-icon" ng-click="muestraForm()"> 
+                                <i class="fa fa-plus"></i>
+                                <span> Agregar</span>
+                            </button>
+                        </div>
+                        <div class=' pull-right'>
+                            <span>búsqueda: <input type="text" ng-model="txtFiltroBusqueda" style="width: 300px"></span>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover table-bordered table-rounded table-condensed responsive mb25">
+                    <thead ng-class="estilo.tableHead">
+                        <tr>                            
+                            <th>N°</th>
+                            <th>Cod.</th>                                                       
+                            <th>Sigla</th>
+                            <th>Nombre</th> 
+                            <th>Tipo</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in listaEntidades| filter: txtFiltroBusqueda | filter: {cTipoEntidad: cmbFiltroTiposEntidades.cTipoEntidad} | filter: {bHabilitado :cmbFiltroActivos}| orderBy: ['cTipoEntidad', 'cEmpresa']">
+                            <td>{{$index + 1}}</td>
+                            <td><b><span ng-bind="item.cEmpresa"></span></b></td>
+                            <td><span ng-bind="item.tSigla"></span></td>
+                            <td><a href="" ng-click="muestraForm(item)"><b> <span ng-bind="item.tNombre"></span></b></a></td>
+                            <td><span ng-bind="item.cTipoEntidad"  title="{{item.tDescripcionCorta}}"  style="padding: 0 10px" ></span></td>
+                            <td>
+                                <label class="switch switch-sm">
+                                    <input type="checkbox" id="someSwitchOptionSuccess" name="someSwitchOption001" ng-model="item.bHabilitado" ng-true-value="'S'" ng-false-value="'N'" disabled="" />
+                                    <span><i class="handle"></i></span>
+                                </label>
+                            </td>
+                            <td>
+                                <a href=""  ng-click="muestraForm(item)" class="glyphicon glyphicon-pencil" title="editar"></a>
+                                <!--<a href="" ng-click="eliminar(item)"><span class="glyphicon glyphicon-trash" title="eliminar"></span></a></td>-->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+

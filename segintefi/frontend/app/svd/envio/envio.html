@@ -1,0 +1,128 @@
+
+<div class="container panel panel-body ">
+    <h3>Validación y envío de Archivos (periodo de fiscalización {{meses[ctxApertura.mes] + ' ' + ctxApertura.ano}})</h3>
+    <div class="row">
+        <div class="panel panel-bordered panel-default p20 col-sm-offset-1 col-sm-10">
+            <fieldset>
+                <h5 class="bold"><i class="fa fa-calendar-o"></i> Fecha Actual: <span >{{ctxApertura.dia_actual + ' / ' + ctxApertura.mes_actual + ' / ' + ctxApertura.ano_actual}} </span></h5>
+                <div class="row bold">
+                    <div class="form-group-lg col-md-12"> 
+                        Entidad: <input type="text" ng-model="ctxEntidad.nombre" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row bold">
+                    <div class="col-md-2">
+                        Fecha de Corte:
+                    </div>
+                    <div class=" form-group col-md-1">
+                        DIA : <input type="text" ng-model="ctxApertura.dia" class="form-control" disabled>
+                    </div>
+                    <div class=" form-group col-md-1">
+                        MES : <input type="text" ng-model="ctxApertura.mes" class="form-control " disabled >
+                    </div>
+                    <div class=" form-group col-md-1">
+                        AÑO :<input type="text" ng-model="ctxApertura.ano" class="form-control " disabled>
+                    </div>
+                    <div class="col-md-offset-1 col-md-6 panel panel-bordered" >
+                        <div class="col-md-12 "><strong> Tipos de Cambio</strong></div>
+                        <div class="col-md-2">
+                            <div><span class="label label-default" style="width: 200px">USD c</span></div>
+                            <div>{{ctxApertura.mCompra}}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div><span class="label label-default " style="width: 200px">USD v</span></div>
+                            <div>{{ctxApertura.mVenta}}</div>
+                        </div>
+                        <div class="col-md-2" >
+                            <div><span class="label label-default " style="width: 200px">EUR</span></div>
+                            <div>{{ctxApertura.mEuroBS}}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <div><span class="label label-default" style="width: 200px">UFV</span></div>
+                            <div>{{ctxApertura.mUFV}}</div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="row ">
+        <div class="col-sm-offset-1 col-sm-10" id="divIniciado" hidden="" > <!-- ng-show="ctxApertura.iniciado"> -->
+            <h4>Seleccione los archivos correspondientes al periodo de fiscalización</h4>
+            <div class="col-md-4">
+                <button ngf-select="uploadFiles($files, $invalidFiles)"  ngf-max-size="2MB"  multiple class=" btn btn-lg btn-primary btn-icon ">
+                    <i class="fa fa-plus"></i>
+                    <span>  Seleccionar archivos</span>
+                </button> 
+                <span class="help-block">máximo de tamaño 2Mb</span>
+            </div>
+            <div class="col-md-4">
+                <button ng-click="quitarArchivos()" class="btn btn-lg btn-warning btn-icon" ng-show="archivosCargados.length + archivosInvalidos.length > 0">
+                    <i class="fa fa-trash-o"></i>
+                    <span> Quitar todos</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="msjDetenido" class="col-sm-offset-1 col-sm-10 bg-warning-dark p10 bordered border-danger text-center bold " style="border-radius: 15px " hidden="" >  <!-- ng-show="!ctxApertura.iniciado"> -->
+            <i class=" fa fa-warning fa-3x"></i>
+            <h4 >El envío de archivos esta detenido. </h4>
+            <h5>Puede ser por estar fuera de la fecha limite permitida, o por alguna razón propia de APS.         </h5>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-8">
+            <div ng-show="archivosCargados.length + archivosInvalidos.length > 0">
+                <p><b>Archivos seleccionados:</b></p>
+                <table class="table table-hover table-bordered table-condensedd responsive mb25">
+                    <thead class="{{estilo.tableHead}}">
+                        <tr>
+                            <th></th>
+                            <th class="w400">Archivo</th>
+                            <th>Tamaño</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="arch in archivosCargados">
+                            <td>{{$index + 1}}</td>
+                            <td><b><span>{{arch.name}}</span></b></td>
+                            <td><b><span>{{arch.size / 1000}} kb</span></b></td>
+                            <td><a href="" ng-click="eliminar(arch)"><i class="fa fa-remove" title="quitar"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button ng-click="validarArchivos()" class="btn btn-block btn-success btn-lg " >
+                    <i class="fa fa-paper-plane-o"></i>
+                    <span>Validación y envio de archivos</span>
+
+                </button>
+                <div ng-show="archivosInvalidos.length > 0">
+                    <ul>
+                        <strong>Archivos inválidos: {{archivosInvalidos.length}} (sobrepasan el tamaño permitido, No serán Cargados ni enviados)</strong>
+                        <li ng-repeat="arch in archivosInvalidos" style="font:smaller">{{arch.name}} - {{arch.kb}} kb (Excede 2MB)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</DIV>
+
+<div class="bg-danger-light p10 fa-lg bordered border-default" hidden="" id="errorEnvio">
+    <i class="fa fa-remove"></i> Ocurrió un error mientras se realizaba el envío de archivos. Por favor intentelo nuevamente.
+</div>
+<div ng-show="val.muestraResultadosValidacion" >
+    <div ng-include="'app/svd/envio/resultados-validacion.html'"></div>
+</div>
+<div class="mostrarProcesando" hidden="">
+    <div>
+        <div class='bg-default-light  btn-lg btn-block p25  text-center'>
+            <i class='fa fa-cog fa-spin fa-4x fa-fw '></i>
+            <span class="bold ">{{textoProcesando}}</span>
+        </div>
+    </div>
+</div>

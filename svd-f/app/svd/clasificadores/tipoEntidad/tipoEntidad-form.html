@@ -1,0 +1,43 @@
+<!--<div class="modal fade" >-->
+<!--<div class="modal-dialog">-->
+
+<!-- Modal content-->
+<!--<div class="modal-content">-->
+<div class="modal-header {{estilo.modalTitle}}">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancelar()">&times;</button>
+    <h3 class="{{estilo.modalTitle}} modal-title" style="padding: 5px 20px">{{subtituloForm}}</h3>
+</div>
+<div class="modal-body">
+    <div id="mensajeErr" class='bg-danger p5 bold pl15 mb10' hidden="" >
+        <i class='fa fa-times-circle fa-lg '></i> 
+        <span ng-bind="mensajeErr"> </span>
+    </div>
+    <div class=" form-horizontal" style="padding-right: 20px"> 
+
+        <div class="form-group" >
+            <label for="codigo" class="control-label col-md-2">Codigo: </label>
+            <div class="col-md-3">
+                <input type="text" id="codigo" class="form-control" ng-model="contexto.cTipoEntidad" ng-disabled="contexto.disabled" placeholder="Codigo">
+            </div>
+        </div>            
+        <div class="form-group" >
+            <label for="nombre" class="control-label col-md-2">Descripción: </label>
+            <div class="col-md-10">
+                <input type="text" id="nombre" class="form-control" ng-model="contexto.tDescripcion" placeholder="Descripción">                 
+            </div>
+        </div>            
+        <div class="form-group" >
+            <label for="descripcion" class="control-label col-md-2">Descripcion corta: </label>
+            <div class="col-md-10">
+                <input type="text" id="descripcion" class="form-control" ng-model="contexto.tDescripcionCorta" placeholder="Descripción corta">
+            </div>
+        </div>              
+        <div class="form-group">
+            <label for="nombre_corto" class="control-label col-md-2">Rango: </label>
+            <div class="col-md-10">
+                <input type="text" id="nombre_corto" class="form-control" ng-model="contexto.tCodigo" placeholder="Rango">
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-include= "'app/svd/comunes/modalFooter.html'"></div>
