@@ -22,14 +22,18 @@ angular
     "cargo":{"id":1,"nombre":"Profesional en Desarrollo de Sistemas"}
 }
             */
-            if(!($localStorage.usuario == undefined)){
+            $scope.ctxEntidad.entidad = false;
+            if($localStorage.usuario.rol.nombre == 'carga_informacion'){
                 $scope.ctxEntidad.nombre =  $localStorage.usuario.entidad.nombre;
+                $scope.ctxEntidad.desc =  $localStorage.usuario.entidad.descripcion;
+                $scope.ctxEntidad.entidad = true;
+
             }
 
             $http.get(comun.urlBackend + 'apertura/activo').success(function(res) {
                 $scope.ctxApertura = res.data;
                 var fecha = res.data.fecha_corte.toString().split('-');
-                $scope.cod_entidad = '101';
+                //$scope.cod_entidad = '101';
                 $scope.ctxApertura.ano = parseInt(fecha[0]);
                 $scope.ctxApertura.mes = parseInt(fecha[1]);
                 $scope.ctxApertura.dia = parseInt(fecha[2].toString().substring(0, 2));
@@ -67,7 +71,15 @@ angular
 
             $scope.validarArchivos = function()
             {
-                var cod_entidad = $scope.cod_entidad; /////////TODO: user.data.entidad.id; 
+                var cod_entidad;
+                if($localStorage.usuario.rol.nombre == 'carga_informacion')
+                {
+                    cod_entidad = $localStorage.usuario.entidad.id;
+                }
+                else
+                {
+                    cod_entidad = $scope.cod_entidad; 
+                }
 
                 $scope.val = {}
                 $scope.val.ctxApertura = $scope.ctxApertura;
@@ -117,7 +129,10 @@ angular
                             }
                         }
                         else{
-                            Flash.create('danger', '<b>ERROR: </b>' + response.message);
+                            angular.element(".mostrarProcesando").hide();
+                            angular.element("#errorEnvio").show(200);
+                             Flash.create('danger', '<b>ERROR: </b>' + response.message);
+                            
                         }
 
                     }).error(function() {

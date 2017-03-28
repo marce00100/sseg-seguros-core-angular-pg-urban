@@ -20,10 +20,10 @@ namespace SVD.Controllers
 
         private SVD.Models.Settings AppSettings;
 
-        public ModalidadesController()
-        {
+        //public ModalidadesController()
+        //{
 
-        }
+        //}
         public ModalidadesController(IOptions<SVD.Models.Settings> settings)
         {
             AppSettings = settings.Value;

@@ -6,6 +6,12 @@ using Dapper;
 using SVD.Models;
 using System;
 
+using SistemaValidacionDatos.controllers;
+using SVD.Utils;
+using Microsoft.Extensions.Options;
+using BO.Aps.Auditoria;
+using Microsoft.AspNetCore.Authorization;
+
 namespace SVD.Controllers
 {
     [Route("svd/api/[Controller]")]
@@ -13,10 +19,32 @@ namespace SVD.Controllers
     {
         private static IDbConnection con = BdPG.instancia();
 
+        private SVD.Models.Settings AppSettings;
+
+        public SgmntController(IOptions<SVD.Models.Settings> settings)
+        {
+            AppSettings = settings.Value;
+        }
+
 
         [HttpGet("envios/{aperActiva_fCorte}")]
+        [Authorize(Roles = "administrador,operador")]
         // puede ser   envios/2016-03-31    o    envios/apertura_activa  
-        public dynamic getSeguimientoEntidades(string aperActiva_fCorte)
+        public dynamic get_SeguimientoEntidades(string aperActiva_fCorte)
+        {
+
+            List<dynamic> listaActivos = SgmntController.getSeguimientoEntidades(aperActiva_fCorte);
+
+            return new
+            {
+                status = "success",
+                mensaje = "encontrados",
+                codigo = "200",
+                data = listaActivos
+            };
+        }
+
+        public static List<dynamic> getSeguimientoEntidades(string aperActiva_fCorte)
         {
             string queryFechaCorte = aperActiva_fCorte == "apertura_activa" ? "(SELECT fecha_corte FROM aperturas WHERE activo)" : "'" + aperActiva_fCorte + "'";
             //obtiene todos los envios de todas las entidades para una fecha de corte (o apertura_actual)
@@ -40,28 +68,24 @@ namespace SVD.Controllers
             {
                 item.envios = lista.Where(o => o.cod_entidad == item.cod_entidad).OrderBy(x => x.fecha_envio);
             }
-
-            return new
-            {
-                status = "success",
-                mensaje = "encontrados",
-                codigo = "200",
-                data = listaActivos
-            };
+            return listaActivos;
         }
 
         //Obtiene todo el contexto de entidad y seguimiento activo de una entidad  de la apertura activa
         [HttpGet("activo/{cod_entidad}")]
+        [Authorize(Roles = "administrador,carga_informacion,operador")] //Obtiene todo el contexto de entidad y seguimiento activo de una entidad  de la apertura activa
         public dynamic getSeguimientoAperturaActivaEntidad(string cod_entidad)
         {
-            dynamic seguimientoActivoEntidad = con.Query<dynamic>(@"SELECT a.fecha_corte, s.id_seguimiento_envio, s.fecha_envio, s.estado, s.activo, s.valido,
-                                                                        e.""cEmpresa"" cod_entidad, e.""tSigla"" sigla, e.""tNombre"" nombre_entidad, e.""cTipoEntidad"" cod_tipo_entidad, 
-                                                                        te.""tDescripcionCorta"" desc_tipo_entidad
-                                                                        FROM seguimiento_envios s, ""rstEmpresas"" e, ""rstTipoEntidad"" te, aperturas a
-                                                                        WHERE s.id_apertura = a.id_apertura AND s.cod_entidad = e.""cEmpresa"" and e.""cTipoEntidad"" = te.""cTipoEntidad""
-                                                                        AND a.activo AND s.activo
-                                                                        AND e.""cEmpresa"" = @cod_entidad ", new { cod_entidad = cod_entidad }).FirstOrDefault();
-            con.Close();
+            string token = HttpHelpers.GetTokenFromHeader(HttpContext);
+            if (token == "")
+                return Unauthorized();
+
+            Base helper = new Base(AppSettings, token, HttpContext.Connection.RemoteIpAddress.ToString());
+
+            if (helper.Role == "carga_informacion")
+                cod_entidad = helper.CiaId;
+
+            dynamic seguimientoActivoEntidad = SgmntController.seguimientoAperturaActivaEntidad(cod_entidad);
             return new
             {
                 status = "success",
@@ -73,8 +97,15 @@ namespace SVD.Controllers
 
         public static dynamic seguimientoAperturaActivaEntidad(string cod_entidad)
         {
-            SgmntController seg = new SgmntController();
-            return seg.getSeguimientoAperturaActivaEntidad(cod_entidad).data;
+            dynamic seguimientoActivoEntidad = con.Query<dynamic>(@"SELECT a.fecha_corte, s.id_seguimiento_envio, s.fecha_envio, s.estado, s.activo, s.valido,
+                                                                        e.""cEmpresa"" cod_entidad, e.""tSigla"" sigla, e.""tNombre"" nombre_entidad, e.""cTipoEntidad"" cod_tipo_entidad, 
+                                                                        te.""tDescripcionCorta"" desc_tipo_entidad
+                                                                        FROM seguimiento_envios s, ""rstEmpresas"" e, ""rstTipoEntidad"" te, aperturas a
+                                                                        WHERE s.id_apertura = a.id_apertura AND s.cod_entidad = e.""cEmpresa"" and e.""cTipoEntidad"" = te.""cTipoEntidad""
+                                                                        AND a.activo AND s.activo
+                                                                        AND e.""cEmpresa"" = @cod_entidad ", new { cod_entidad = cod_entidad }).FirstOrDefault();
+            con.Close();
+            return seguimientoActivoEntidad;
         }
 
         // obtiene el contexto de seguimiento y entidad de un cualquier seguimiento
@@ -90,48 +121,33 @@ namespace SVD.Controllers
             return seguimientoActivoEntidad;
         }
 
-        [HttpPost()]
-        /// obj = {cod_entidad : '109', estado: 1 }
-        public object insertarSeguimientoEnvio([FromBody]dynamic obj)
+
+        public static int insertarSeguimientoEnvio(string codEntidad, int estado)
         {
-            // AperturaController apertura = new AperturaController();
             dynamic aperturaActiva = AperturaController.getAperturaActiva();
 
             con.Execute(@"UPDATE seguimiento_envios SET activo = false 
-                           WHERE activo AND cod_entidad = @cod_entidad AND 
-                           id_apertura IN (SELECT id_apertura FROM aperturas WHERE fecha_corte = @fecha_corte )",
-                           new { cod_entidad = (string)obj.cod_entidad, fecha_corte = (DateTime)aperturaActiva.fecha_corte });
+                            WHERE activo AND cod_entidad = @cod_entidad AND 
+                            id_apertura IN (SELECT id_apertura FROM aperturas WHERE fecha_corte = @fecha_corte )",
+                            new { cod_entidad = codEntidad, fecha_corte = (DateTime)aperturaActiva.fecha_corte });
             con.Close();
             SeguimientoEnvio seg = new SeguimientoEnvio();
             seg.id_apertura = aperturaActiva.id_apertura;
-            seg.cod_entidad = obj.cod_entidad;
+            seg.cod_entidad = codEntidad;
             seg.fecha_envio = DateTime.Now;
-            seg.estado = obj.estado.ToString();
+            seg.estado = estado.ToString();
             seg.activo = true;
-            seg.valido = obj.estado > 2;  // si es 3: advertencia o 4: valido
+            seg.valido = estado > 2;  // si es 3: advertencia o 4: valido
             seg.creado_por = 999;
             seg.creado_en = DateTime.Now;
             seg.id_seguimiento_envio = con.Query<int>(@"INSERT INTO seguimiento_envios(
-                                                            id_apertura, cod_entidad, fecha_envio, estado, 
-                                                           activo, valido, creado_por, creado_en)
-                                                           VALUES ( @id_apertura, @cod_entidad, @fecha_envio, @estado,
-                                                           @activo, @valido, @creado_por,  @creado_en) 
-                                                           RETURNING id_seguimiento_envio", seg).Single();
+                                                             id_apertura, cod_entidad, fecha_envio, estado, 
+                                                            activo, valido, creado_por, creado_en)
+                                                            VALUES ( @id_apertura, @cod_entidad, @fecha_envio, @estado,
+                                                            @activo, @valido, @creado_por,  @creado_en) 
+                                                            RETURNING id_seguimiento_envio", seg).Single();
             con.Close();
-            return new
-            {
-               status = "success",
-               mensaje = "creado",
-               codigo = "201",
-               data = seg.id_seguimiento_envio
-            };
-        }
-        public static int insertarSeguimientoEnvio(string codEntidad, int estado)
-        {
-            dynamic obj = new { cod_entidad = codEntidad, estado = estado };
-            SgmntController seg = new SgmntController();
-            dynamic objetoInsertado = seg.insertarSeguimientoEnvio(obj);
-            return objetoInsertado.data;
+            return seg.id_seguimiento_envio;
         }
 
         public static void modificaEstado(int idSeguimientoEnvio, int codEstado)
@@ -143,14 +159,21 @@ namespace SVD.Controllers
         }
 
         [HttpPut("validez")]
+        [Authorize(Roles = "administrador,operador")]
         public object modificarSeguimiento([FromBody]dynamic obj)
         {
+            string token = HttpHelpers.GetTokenFromHeader(HttpContext);
+            if (token == "")
+                return Unauthorized();
+
+            Base helper = new Base(AppSettings, token, HttpContext.Connection.RemoteIpAddress.ToString());
+
             SeguimientoEnvio seg = con.Query<SeguimientoEnvio>(@"Select * from seguimiento_envios 
                                                                 WHERE activo AND id_seguimiento_envio = @id ", new { id = (Int32)obj.id_seguimiento_envio }).FirstOrDefault();
             con.Close();
             seg.observaciones = obj.observaciones;
             seg.valido = obj.valido;
-            seg.modificado_por = 999;
+            seg.modificado_por = helper.UsuarioId;
             seg.modificado_en = DateTime.Now;
 
             if (!seg.valido)
@@ -164,6 +187,8 @@ namespace SVD.Controllers
                             modificado_por = @modificado_por, modificado_en = @modificado_en 
                             WHERE id_seguimiento_envio = @id_seguimiento_envio ", seg);
             con.Close();
+
+            helper.AddLog(Log.TipoOperaciones.Modificacion, typeof(SgmntController), "modificarSeguimiento", seg);
             return new
             {
                 status = "success",

@@ -22,8 +22,8 @@ namespace SVD.Controllers
         // my code
         private SVD.Models.Settings AppSettings;
 
-        public AperturaController()
-        { }
+        //public AperturaController()
+        //{ }
 
         public AperturaController(IOptions<SVD.Models.Settings> settings)
         {
@@ -59,7 +59,7 @@ namespace SVD.Controllers
 
 
                 // my code
-                helper.AddLog(Log.TipoOperaciones.Modificacion, typeof(AperturaController), "getAperturaActiva", seg);
+                // helper.AddLog(Log.TipoOperaciones.Modificacion, typeof(AperturaController), "getAperturaActiva", seg);
                 // end my code
 
                 if (seg != null)
@@ -112,7 +112,7 @@ namespace SVD.Controllers
         }
 
         [HttpGet("ultima_de_fecha_corte/{mes}/{ano}")]
-        [Authorize(Roles = "administrador,operador")]
+        [Authorize(Roles = "administrador,carga_informacion,operador")]
         public dynamic getAperturaFechaCorte(int mes, int ano)
         {
             dynamic seg = con.Query<dynamic>(@"SELECT a.id_apertura, a.fecha_corte, a.iniciado, a.fecha_inicio_envios, a.fecha_detiene_envios,
@@ -180,9 +180,9 @@ namespace SVD.Controllers
                 if (confActiva.usa_factor_tc)
                 {
                     DateTime fechaFinMesAnterior = obj.fecha_corte.AddDays(-obj.fecha_corte.Day); // se calcula el ultima dia del mes anterior
-                    CotizacionesController cot = new CotizacionesController();
-                    dynamic tc = cot.cotizacionFecha(obj.fecha_corte);
-                    dynamic tcFinMesAnterior = cot.cotizacionFecha(fechaFinMesAnterior); // tipos de cambio del ultimo dia del mes anterior
+                    //CotizacionesController cot = new CotizacionesController();
+                    dynamic tc = CotizacionesController.cotizacionFecha(obj.fecha_corte);
+                    dynamic tcFinMesAnterior = CotizacionesController.cotizacionFecha(fechaFinMesAnterior); // tipos de cambio del ultimo dia del mes anterior
                     if (confActiva.moneda_factor_tc == "2")
                         factorTC = (tc.mCompra / tcFinMesAnterior.mCompra) - 1;
                     else if (confActiva.moneda_factor_tc == "4")

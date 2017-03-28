@@ -41,8 +41,7 @@ angular
                 $scope.cot.mes = fechaCorte.getMonth() + 1;
                 $scope.cot.dia = fechaCorte.getDate();
                 $scope.cot.dia_semana = fechaCorte.getDay();
-                $scope.buscafechaCotizaciones();
-                $scope.$broadcast('actualizar_envios', '');
+                $scope.buscafechaCotizaciones();                
             });
 
 
@@ -54,6 +53,7 @@ angular
 
                 $http.get(comun.urlBackend + 'cotizaciones/' + $scope.cot.ano + '-' + $scope.cot.mes + '-' + $scope.cot.dia).success(function(res) {
                     $scope.cot.cotizacion = res.data;
+                    $scope.$broadcast('actualizar_envios', '');
                     ($scope.cot.cotizacion == null) ? angular.element("#msjNoCotizacion").show(200) : angular.element("#msjNoCotizacion").hide(200);
                 });
             }

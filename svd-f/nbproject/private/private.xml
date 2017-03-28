@@ -3,19 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/envio/resultados-validacion.html</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/res-validacion-ent.html</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/controlController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/app.main.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/control.html</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/seguimientoController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/envio/envioController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/seguimiento.html</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/clasificadores/entidades/entidadesController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/control/historicosController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/consolidacion/consolidacionController.js</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/envio/envio.html</file>
-            <file>file:/C:/wamp64/www/SSEG-v1/svdf/app/svd/consolidacion/consolidacion.html</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/envio/resultados-validacion.html</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/control/controlController.js</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/envio/envioController.js</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/envio/envio.html</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/control/seguimientoController.js</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/consolidacion/consolidacionController.js</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/control/control.html</file>
+            <file>file:/C:/wamp64/www/SSEG-v1/svd-f/app/svd/control/seguimiento.html</file>
         </group>
     </open-files>
 </project-private>

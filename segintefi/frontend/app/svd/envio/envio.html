@@ -7,7 +7,8 @@
                 <h5 class="bold"><i class="fa fa-calendar-o"></i> Fecha Actual: <span >{{ctxApertura.dia_actual + ' / ' + ctxApertura.mes_actual + ' / ' + ctxApertura.ano_actual}} </span></h5>
                 <div class="row bold">
                     <div class="form-group-lg col-md-12"> 
-                        Entidad: <input type="text" ng-model="ctxEntidad.nombre" class="form-control">
+                        Entidad: <input type="text" ng-model="cod_entidad" class="form-control" ng-hide="ctxEntidad.entidad">
+                        <h3><span ng-show="ctxEntidad.entidad">{{ctxEntidad.nombre + " - " + ctxEntidad.desc }}</span></h3>
                     </div>
                 </div>
 

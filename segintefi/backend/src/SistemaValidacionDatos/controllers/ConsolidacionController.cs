@@ -8,6 +8,12 @@ using System;
 using System.Dynamic;
 using System.Threading;
 
+using SistemaValidacionDatos.controllers;
+using SVD.Utils;
+using Microsoft.Extensions.Options;
+using BO.Aps.Auditoria;
+using Microsoft.AspNetCore.Authorization;
+
 namespace SVD.Controllers
 {
     [Route("svd/api/[Controller]")]
@@ -33,6 +39,13 @@ namespace SVD.Controllers
         private int paso = 0;
 
 
+
+        private SVD.Models.Settings AppSettings;
+
+        public ConsolidacionController(IOptions<SVD.Models.Settings> settings)
+        {
+            AppSettings = settings.Value;
+        }
 
         private dynamic[] comodinesParaInsertar = {
             new {
@@ -65,10 +78,16 @@ namespace SVD.Controllers
         /////////////////////////////////////////////  1. CONSOLIDACION /////////////////////////////////////////////////////////////
 
         [HttpPost("envios_validos")]
+        [Authorize(Roles = "administrador,operador")]
         public object consolidacionDeEntidad([FromBody]dynamic objObservaciones)
         {
-            SgmntController segObj = new SgmntController();
-            List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            string token = HttpHelpers.GetTokenFromHeader(HttpContext);
+            if (token == "")
+                return Unauthorized();
+
+            Base helper = new Base(AppSettings, token, HttpContext.Connection.RemoteIpAddress.ToString());
+
+            List<dynamic> enviosAct = SgmntController.getSeguimientoEntidades("apertura_activa");
             enviosAct = enviosAct.Where(x => x.valido && (x.estado_cierre == null || x.estado_cierre == "")).ToList();
 
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
@@ -79,12 +98,14 @@ namespace SVD.Controllers
             List<dynamic> listaRes = new List<dynamic>();
             bool procesoExitoso = true;
             Exception excepcion = null; // TO DO habilitar error para visualizar errores, deshabilitar en produccion 
+            if (objObservaciones.observaciones == null)
+                objObservaciones.observaciones = "";
 
             if (enviosAct.Count > 0)
             {
                 // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
                 //INICIALIZA PROCESO CONSOLIDACION 
-                int id_consolidacion = this.insertConsolidacion(objObservaciones.observaciones.ToString());
+                int id_consolidacion = this.insertConsolidacion(objObservaciones.observaciones.ToString(), helper);
 
                 foreach (dynamic envio in enviosAct)
                 {
@@ -179,10 +200,10 @@ namespace SVD.Controllers
         //##############################################################################################################################################
         ////////////////////////////////////////// 2 CIERRE  en caso de necesitar margen de Solvencia (TRIMESTRAL)  ///////////////////////////////////////////////////////////////////////
         [HttpPost("re_calcular_margen_solvencia")] // este ptroceso es llamado cuando es el caso del Margen de solvencia, cada trimestre, se realiza esta segunda llamada a los procesos del 1 al 4b
+        [Authorize(Roles = "administrador,operador")]
         public object cerrarConsolidados([FromBody]List<dynamic> consolidadosOb) //consolidadosOB tiene los objetos envio  con mPatTecnico y mMSPrevisional de cada entidad
         {
-            SgmntController segObj = new SgmntController();
-            List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            List<dynamic> enviosAct = SgmntController.getSeguimientoEntidades("apertura_activa");
             List<dynamic> consolidacionesList = enviosAct.Where(x => x.estado_cierre != null && x.estado_cierre == "consolidado").Select(x => x.id_consolidacion).Distinct().ToList();
 
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
@@ -292,7 +313,7 @@ namespace SVD.Controllers
                 return new
                 {
                     status = "error",
-                    message = ex.Message
+                    message = "No existe conexion a las  bases de datos SQL :" + ex.Message
                 };
             }
             // end my code
@@ -301,6 +322,7 @@ namespace SVD.Controllers
 
 
         [HttpGet("obtieneconsolidados")]
+        [Authorize(Roles = "administrador,operador")]
         public object obtieneConsolidados()
         {
             List<dynamic> consolidados = new List<dynamic>(con.Query(@"SELECT a.id_apertura, a.fecha_corte, e.""tNombre"" as entidad_nombre, s.* , c.nombre as desc_estado, ms.""mMSPrevisional"", pt.""mPatTecnico""
@@ -327,30 +349,32 @@ namespace SVD.Controllers
         }
 
 
-        public int insertConsolidacion([FromBody]string observaciones)
+        public int insertConsolidacion(string observaciones, Base helper)
         {
+
             // AperturaController aper = new AperturaController();
             dynamic aperturaActiva = AperturaController.getAperturaActiva();
             object consolidacion = new
             {
-               fecha_consolidacion = DateTime.Now,
-               fecha_corte = aperturaActiva.fecha_corte,
-               estado = "",
-               procesando = true,
-               observaciones = observaciones,
+                fecha_consolidacion = DateTime.Now,
+                fecha_corte = aperturaActiva.fecha_corte,
+                estado = "",
+                procesando = true,
+                observaciones = observaciones,
 
-               creado_por = 999,
-               creado_en = DateTime.Now
+                creado_por = helper.UsuarioId,
+                creado_en = DateTime.Now
             };
             int id = con.Query<int>(@"INSERT INTO consolidaciones( fecha_consolidacion,
                                                        estado, fecha_corte, procesando, observaciones, creado_por, creado_en)
                                    VALUES (@fecha_consolidacion,
                                    @estado, @fecha_corte,  @procesando, @observaciones,  @creado_por, @creado_en) RETURNING id_consolidacion", consolidacion).Single();
             con.Close();
+            helper.AddLog(Log.TipoOperaciones.Modificacion, typeof(ConsolidacionController), "insertar", consolidacion);
             return id;
         }
 
-        [HttpPut()]
+        //[HttpPut()]
         public void estadoConsolidacion(int idConsolidacion, string estadoCierre, bool procesando)
         {
             object consolidacion = new
@@ -362,48 +386,5 @@ namespace SVD.Controllers
             con.Execute(@"UPDATE consolidaciones SET estado = @estado, procesando = @procesando WHERE id_consolidacion = @id_consolidacion ", consolidacion);
             con.Close();
         }
-
-        [HttpGet("pruebaETL")]
-        public object prueba_ETL()
-        {
-            List<object> misql = new List<object>(conSegSql.Query<object>("select * from iftPlanUnicoCuentas "));
-            foreach (object item in misql)
-            {
-                con.Execute(@"insert into ""iftPlanUnicoCuentas"" 
-                    values (@cTipoEntidad
-                    ,@cCuentaFinanciera
-                    ,@cMoneda
-                    ,@cCuentaTecnica
-                    ,@tDescripcion
-                    ,@cNivel
-                    ,@cCuentaPadre) ", item);
-
-
-            }
-            return "OKI";
-        }
-
-
-        [HttpGet("prueba")]
-        public object prueba()
-        {
-            try
-            {
-                int a = 3;
-                int b = 4;
-
-                decimal h = b / (a - 3);
-
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-
-
-            return "OKI";
-        }
-
-
     }
 }

@@ -62,7 +62,7 @@ namespace SVD.Controllers
 
                 Configuracion old = con.Query<Configuracion>("select * from configuraciones where id_configuracion = @id", new { id = elem.id_configuracion }).FirstOrDefault();
 
-                old.modificado_por = 999;
+                old.modificado_por = helper.UsuarioId;
                 old.modificado_en = DateTime.Now;
                 old.activo = false;
                 con.Execute(@"Update configuraciones set usa_factor_tc=@usa_factor_tc, moneda_factor_tc=@moneda_factor_tc, margen_partes_ef=@margen_partes_ef, 

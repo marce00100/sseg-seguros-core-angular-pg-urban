@@ -108,7 +108,7 @@ namespace SVD.Controllers
         ///         ]
         ///   }
         [HttpPost("formato")] // la ruta puede ser formato/efectivo (realiza guarda el seguimiento y guarda errores)  o formato/test (para pruebas)  
-        [Authorize(Roles = "carga_informacion,operador")]  // definir sólo los roles que pueden invocar a esta acción
+        [Authorize(Roles = "carga_informacion,operador,administrador")]  // definir sólo los roles que pueden invocar a esta acción
         public object validacionFormato([FromBody]dynamic objetoRecibido)
         {
             try
@@ -269,7 +269,7 @@ namespace SVD.Controllers
 
         //############################                        VALIDACIONES   C O N T E N I D O               #################################################/////////////////////////    
         [HttpPost("contenido")]
-        [Authorize(Roles = "carga_informacion,operador")]
+        [Authorize(Roles = "carga_informacion,operador,administrador")]
         public object validacionSIF([FromBody]dynamic objetoRecibido)// objetoRecibido = {cod_entidad:cod_entidad}
         {
             try
@@ -280,6 +280,8 @@ namespace SVD.Controllers
                     return Unauthorized();
 
                 Base helper = new Base(AppSettings, token, HttpContext.Connection.RemoteIpAddress.ToString());
+                if (helper.Role == "carga_informacion")
+                    objetoRecibido.cod_entidad = helper.CiaId;
 
                 inicializaDatos(objetoRecibido.cod_entidad.ToString());
                 this.archivosEntidadCadena = ArchivosController.encadenaArchivosDeEntidadMes(this.codigoEntidad, this.mesControl);
@@ -344,7 +346,7 @@ namespace SVD.Controllers
 
         /// #############################               VALIDACION    P A R T E  S    E F                          ############################################////////////// 
         [HttpPost("partesEF")]
-        [Authorize(Roles = "carga_informacion,operador")]
+        [Authorize(Roles = "carga_informacion,operador,administrador")]
         public object validacionPartesEF([FromBody]dynamic objetoRecibido) // objetoRecibido = {cod_entidad:cod_entidad}
         {
             inicializaDatos(objetoRecibido.cod_entidad.ToString());
@@ -385,7 +387,7 @@ namespace SVD.Controllers
 
         /// #############################       VALIDACION  de    H I S t O R I C O        ////////////////////////////////////////////////////// 
         [HttpGet("consulta/{web_reporte}/{idSeguimientoEnvio}")] //  web_reporte puede ser "web" o "reporte"
-        [Authorize(Roles = "operador")]
+        [Authorize(Roles = "administrador,operador")]
         public object validacionConsultaPartesEF(string web_reporte, int idSeguimientoEnvio) //objetoRecibido = {id_seguimiento_envio }
         {
             try

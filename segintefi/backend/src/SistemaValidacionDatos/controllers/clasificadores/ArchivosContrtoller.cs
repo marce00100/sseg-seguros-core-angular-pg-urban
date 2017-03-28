@@ -170,34 +170,53 @@ namespace SVD.Controllers
         [Authorize(Roles = "administrador")]
         public object eliminar(int id)
         {
-            Archivo archivoOld = con.Query<Archivo>("SELECT * FROM archivos WHERE id_archivo = @id_archivo and vigente = true", new { id_archivo = id }).FirstOrDefault();
-            con.Close();
-            if (Config.habilitarHistoricos)
+            try
             {
-                archivoOld.vigente = false;
-                funcionUpdate(archivoOld);
-            }
+                // my code
+                string token = HttpHelpers.GetTokenFromHeader(HttpContext);
+                if (token == "")
+                    return Unauthorized();
 
-            Archivo archivoEliminado = archivoOld;
-            archivoEliminado.eliminado = true;
-            archivoEliminado.vigente = true;
-            archivoEliminado.modificado_en = DateTime.Now;
-            archivoEliminado.modificado_por = 999;
-            if (Config.habilitarHistoricos)
-            {
-                funcionInsert(archivoEliminado);
+                Base helper = new Base(AppSettings, token, HttpContext.Connection.RemoteIpAddress.ToString());
+
+                Archivo archivoOld = con.Query<Archivo>("SELECT * FROM archivos WHERE id_archivo = @id_archivo and vigente = true", new { id_archivo = id }).FirstOrDefault();
+                con.Close();
+                if (Config.habilitarHistoricos)
+                {
+                    archivoOld.vigente = false;
+                    funcionUpdate(archivoOld);
+                }
+
+                Archivo archivoEliminado = archivoOld;
+                archivoEliminado.eliminado = true;
+                archivoEliminado.vigente = true;
+                archivoEliminado.modificado_en = DateTime.Now;
+                archivoEliminado.modificado_por = helper.UsuarioId;
+                if (Config.habilitarHistoricos)
+                {
+                    funcionInsert(archivoEliminado);
+                }
+                else
+                {
+                    funcionUpdate(archivoEliminado);
+                }
+                helper.AddLog(Log.TipoOperaciones.Modificacion, typeof(ArchivosController), "actualizar", archivoEliminado);
+                return new
+                {
+                    status = "success",
+                    mensaje = "eliminado",
+                    codigo = "200",
+                    data = archivoEliminado
+                };
             }
-            else
+            catch (Exception ex)
             {
-                funcionUpdate(archivoEliminado);
+                return new
+                {
+                    status = "error",
+                    mensaje = ex.Message
+                };
             }
-            return new
-            {
-                status = "success",
-                mensaje = "eliminado",
-                codigo = "200",
-                data = archivoEliminado
-            };
         }
 
 

@@ -16,14 +16,14 @@ namespace SVD.Controllers
     [Route("svd/api/[Controller]")]
     public class CotizacionesController : Controller
     {
-        private IDbConnection con = BdPG.instancia();
+        private static IDbConnection con = BdPG.instancia();
 
         private SVD.Models.Settings AppSettings;
 
-        public CotizacionesController()
-        {
+        //public CotizacionesController()
+        //{
 
-        }
+        //}
         public CotizacionesController(IOptions<SVD.Models.Settings> settings)
         {
             AppSettings = settings.Value;
@@ -70,7 +70,7 @@ namespace SVD.Controllers
         [Authorize(Roles = "administrador")]
         public dynamic cotizacionPorFecha(DateTime fecha)
         {
-            dynamic cotizacionItem = this.cotizacionFecha(fecha); // con.Query<object>(@"SELECT * FROM ""cmtTipoCambio"" WHERE ""fTipoCambio""  = @fecha ", new { fecha = fecha }).FirstOrDefault();
+            dynamic cotizacionItem = CotizacionesController.cotizacionFecha(fecha); // con.Query<object>(@"SELECT * FROM ""cmtTipoCambio"" WHERE ""fTipoCambio""  = @fecha ", new { fecha = fecha }).FirstOrDefault();
             con.Close();
             string status, mensaje, codigo;
             if (cotizacionItem == null)
@@ -95,7 +95,7 @@ namespace SVD.Controllers
             };
         }
 
-        public dynamic cotizacionFecha(DateTime fecha)
+        public static dynamic cotizacionFecha(DateTime fecha)
         {
             dynamic cotizacionItem = con.Query<dynamic>(@"SELECT * FROM ""cmtTipoCambio"" WHERE ""fTipoCambio""  = @fecha ", new { fecha = fecha }).FirstOrDefault();
             con.Close();

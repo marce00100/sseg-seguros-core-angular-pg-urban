@@ -20,10 +20,10 @@ namespace SVD.Controllers
 
         private SVD.Models.Settings AppSettings;
 
-        public TipoEntidadController()
-        {
+        //public TipoEntidadController()
+        //{
 
-        }
+        //}
         public TipoEntidadController(IOptions<SVD.Models.Settings> settings)
         {
             AppSettings = settings.Value;

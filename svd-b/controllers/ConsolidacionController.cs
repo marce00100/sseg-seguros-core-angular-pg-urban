@@ -67,8 +67,7 @@ namespace SVD.Controllers
         [HttpPost("envios_validos")]
         public object consolidacionDeEntidad([FromBody]dynamic objObservaciones)
         {
-            SgmntController segObj = new SgmntController();
-            List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            List<dynamic> enviosAct = SgmntController.getSeguimientoEntidades("apertura_activa");
             enviosAct = enviosAct.Where(x => x.valido && (x.estado_cierre == null || x.estado_cierre == "")).ToList();
 
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
@@ -79,7 +78,8 @@ namespace SVD.Controllers
             List<dynamic> listaRes = new List<dynamic>();
             bool procesoExitoso = true;
             Exception excepcion = null; // TO DO habilitar error para visualizar errores, deshabilitar en produccion 
-
+            if (objObservaciones.observaciones == null)
+                objObservaciones.observaciones = "";
             if (enviosAct.Count > 0)
             {
                 // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
@@ -123,12 +123,12 @@ namespace SVD.Controllers
                             }
                             this.paso = 1;
 
-                            // llama al metodo que realiza pasos para el cierre
-                            this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
-                            // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
-                            this.procedimientosCierreHastaSIG(this.codigoEntidad);
+                            // // llama al metodo que realiza pasos para el cierre
+                            // this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
+                            // // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
+                            // this.procedimientosCierreHastaSIG(this.codigoEntidad);
 
-                            this.informacionFinancieraOLAP();
+                            // this.informacionFinancieraOLAP();
 
 
                             ////_____________________________ se crea la respuesta  que es una lista de las compañias enviadas ________________________                    
@@ -181,8 +181,7 @@ namespace SVD.Controllers
         [HttpPost("re_calcular_margen_solvencia")] // este ptroceso es llamado cuando es el caso del Margen de solvencia, cada trimestre, se realiza esta segunda llamada a los procesos del 1 al 4b
         public object cerrarConsolidados([FromBody]List<dynamic> consolidadosOb) //consolidadosOB tiene los objetos envio  con mPatTecnico y mMSPrevisional de cada entidad
         {
-            SgmntController segObj = new SgmntController();
-            List<dynamic> enviosAct = segObj.getSeguimientoEntidades("apertura_activa").data;
+            List<dynamic> enviosAct = SgmntController.getSeguimientoEntidades("apertura_activa");
             List<dynamic> consolidacionesList = enviosAct.Where(x => x.estado_cierre != null && x.estado_cierre == "consolidado").Select(x => x.id_consolidacion).Distinct().ToList();
 
             this.fechaCorte = con.Query<DateTime>("Select fecha_corte from aperturas where activo").FirstOrDefault();
