@@ -12,7 +12,8 @@
         </div>
     </div>
     <div class="mostrarCargado" hidden="">
-        <div>
+        <div class="text-right"><button ng-click="exportarPDF()" class="btn btn-default"><i class="fa fa-lg  fa-file-pdf-o" > </i><span> imprimir PDF</span></button></div>
+        <div id="resultadoValidacion">
             <div class='{{entEnvio.valido ? "bg-success-light":"bg-danger"}} text-center'>
                 - Valido para consolidación : {{entEnvio.valido ? 'SI' : 'NO'}}<br>
                 - Estado de la Validación: <label class="badge {{estiloAlert[entEnvio.estado]}}">{{entEnvio.desc_estado}} </label>  

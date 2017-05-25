@@ -56,7 +56,7 @@ namespace SVD.Models
             if (this._instancia == null)
             {
                 // string conectionString = config.GetValue<string>("DBInfo:ConnectionString");
-                this._instancia = new SqlConnection(Config.connStrDbSegurosSQL);
+                this._instancia = new SqlConnection(Config.connStrSegurosOlapSQL);
                 this._instancia.Open();
             }
         }

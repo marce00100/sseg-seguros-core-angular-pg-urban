@@ -382,7 +382,7 @@ namespace SVD.Controllers
             data.diferencia_con_bs = partes_sins_totales.sins_reaseguro_aceptado - sinPagReaAcep_EF;
 
             valEF.data = data;
-            valEF.valido = (Math.Abs((decimal)partes_sins_totales.sins_reaseguro_aceptado_m - sinPagReaAcep_EF) > margenEF || Math.Abs((decimal)partes_sins_totales.sins_reaseguro_aceptado - sinPagReaAcep_EF) > margenEF) ? false : true;
+            valEF.valido =  (Math.Abs((decimal)partes_sins_totales.sins_reaseguro_aceptado_m - sinPagReaAcep_EF) > margenEF || Math.Abs((decimal)partes_sins_totales.sins_reaseguro_aceptado - sinPagReaAcep_EF) > margenEF) ? false : true;
 
             //"209  "La Participación de Siniestros Aceptados en Reaseguro Nacional y Extranjero en el Parte no corresponden al monto reportado en Estados Financieros, cuentas 51701, 51702, 51703, 51901, 51902, 51903
             Error error = err("209", "A o C", "", 0, 0);        //  error genérico para este tipo de validacion
@@ -418,7 +418,7 @@ namespace SVD.Controllers
             valEF.valido = (Math.Abs((decimal)partes_sins_totales.sins_reaseguro_cedido_m - sinReemReaCed_EF) > margenEF || Math.Abs((decimal)partes_sins_totales.sins_reaseguro_cedido - sinReemReaCed_EF) > margenEF) ? false : true;
 
             //"210  "Los Siniestros Reembolsados por Cesiones en Reaseguro Nacional y Extranjero en el Parte no corresponden al monto reportado en Estados Financieros, cuentas 51101, 51102, 51103, 41101, 41102, 41103
-            Error error = err("201", "A o C", "", 0, 0);        //  error genérico para este tipo de validacion
+            Error error = err("210", "A o C", "", 0, 0);        //  error genérico para este tipo de validacion
             valEF.validacion = error.nombre_error;
             valEF.estadoValidez = valEF.valido ? 4 : error.estadoValidez;
             valEF.descripcionError = valEF.valido ? "sin error" : error.error + " " + error.desc_error;

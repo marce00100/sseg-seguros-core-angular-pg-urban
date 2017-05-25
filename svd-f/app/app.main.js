@@ -46,6 +46,34 @@ angular
         $rootScope.cancelar = function() {
             $rootScope.instanciaModal.dismiss('cancel');
         }
+
+        $rootScope.exportarPDF = function()
+        {
+            var html = $("#resultadoValidacion").html();
+//            switch (modulo)
+//            {
+//                case 1:
+//                    cabecera = marked(contexto.cabecera);
+//                    pie = marked(contexto.pie);
+//                    html = "<header>" + cabecera + "</header>" + html + "<footer>" + pie + "</footer>";
+//                    break;
+//                case 2:
+//                    html = marked(contexto.contenido);
+//                    break;
+//                case 3:
+//                    html = $rootScope.adecuarParaVisualizar(contexto.plantilla_contenido);
+//                    html = marked(html);
+//                    cabecera = marked(contexto.maestra_cabecera);
+//                    pie = marked(contexto.maestra_pie);
+//                    html = "<header>" + cabecera + "</header>" + html + "<footer>" + pie + "</footer>";
+//                    break;
+//            }
+            var fecha = new Date();
+            var nombre = 'val_' + util.getFecha(fecha, 'yyyy-MM-dd' ) + '.pdf';
+            console.log(nombre);
+            console.log(html)
+            util.pdfDesdeHtml(html, nombre);
+        }
     });
 angular
     .module('ApsApp')

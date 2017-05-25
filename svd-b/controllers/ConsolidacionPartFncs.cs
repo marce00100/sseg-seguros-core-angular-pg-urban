@@ -436,7 +436,7 @@ namespace SVD.Controllers
                 conSegSql.Execute("svdp_ifpIndicador_CalcularTodo",
                                 new { fInformacion = this.FechaCorteInt, cEmpresa = this.codigoEntidad }, commandTimeout: 120, commandType: CommandType.StoredProcedure);
                 this.paso = 1010;
-                
+
                 // 2. ******************************       No se realiza
 
                 // 3. ***********************                      afecta tabla    iftCapitalMinimo
@@ -542,12 +542,11 @@ namespace SVD.Controllers
 
         }
 
-        public void informacionFinancieraOLAP()
+        public void informacionFinancieraOLAP_PUC()
         {
-            conOLAPSql.Execute("truncate table iffBalanceEstadoResultados_T");
-            conOLAPSql.Execute("truncate table iffBalanceEstadoResultados");
-            conOLAPSql.Execute("truncate table iffIndicadores");
-            conOLAPSql.Execute("truncate table iffPartesProduccionSiniestros");
+            ////////////////////////////////  PUCS Niveles ////////// tiempo aprox: 20 s /////////////// 
+
+            // conOLAPSql.Execute("truncate table iffBalanceEstadoResultados");
 
             conOLAPSql.Execute("delete from iffPUC_Nivel_5");
             conOLAPSql.Execute("delete from iffPUC_Nivel_4");
@@ -555,91 +554,406 @@ namespace SVD.Controllers
             conOLAPSql.Execute("delete from iffPUC_Nivel_2");
             conOLAPSql.Execute("delete from iffPUC_Nivel_1");
 
-            List<dynamic> puc5 = new List<dynamic>(con.Query<dynamic>(@"SELECT
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"" || ""cCuentaTecnica""  ""cCuenta"",
-                                                                            '[' || RTRIM (""cCuentaFinanciera"") || RTRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
-                                                                        FROM
-                                                                            ""iftPlanUnicoCuentas""
-                                                                        WHERE
-                                                                            length(RTRIM (""cCuentaFinanciera"")) = 5
-                                                                            AND ""cMoneda"" = '0'
-                                                                            AND length (RTRIM (""cCuentaTecnica""))  = 4
-                                                                        GROUP BY
-                                                                            ""cCuentaPadre"", ""cCuentaFinanciera"", ""cCuentaTecnica""                                                                                                
+            ////////////////////////////////// iffPUC_Nivel_1 //////////////////////////////////////////
+
+            List<dynamic> puc1 = new List<dynamic>(con.Query<dynamic>(@" SELECT
+                                                                            TRIM(""cCuentaFinanciera"") || TRIM(""cCuentaTecnica"")  ""cCuenta"",
+                                                                            '[' || TRIM (""cCuentaFinanciera"") || TRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
+                                                                        FROM   ""iftPlanUnicoCuentas""
+                                                                        WHERE length(RTRIM (""cCuentaFinanciera"")) = 1  AND ""cMoneda"" = '0'       AND length (RTRIM (""cCuentaTecnica""))  = 0
+                                                                        GROUP BY TRIM(""cCuentaPadre""), TRIM(""cCuentaFinanciera""),  TRIM(""cCuentaTecnica"")
+                                                                        order by ""cCuenta""            "));
+
+            string queryIns = @" INSERT INTO ""iffPUC_Nivel_1"" 
+                                  VALUES (  @cCuenta , @tDescripcion )";
+
+            foreach (dynamic item in puc1)
+            {
+                object regPuc1 = new
+                {
+                    cCuenta = item.cCuenta.ToString(),
+                    tDescripcion = item.tDescripcion.ToString()
+                };
+                conOLAPSql.Execute(queryIns, regPuc1);
+
+            }
+            con.Close();
+            conOLAPSql.Close();
+
+            ////////////////////////////////// iffPUC_Nivel_2 //////////////////////////////////////////
+            List<dynamic> puc2 = new List<dynamic>(con.Query<dynamic>(@"SELECT        ""cCuentaPadre"", TRIM(""cCuentaFinanciera"") AS ""cCuenta"", '[' || TRIM(""cCuentaFinanciera"") || '] ' || MIN(""tDescripcion"") AS ""tDescripcion""
+                                                                        FROM            ""iftPlanUnicoCuentas""
+                                                                        WHERE        length(RTRIM(""cCuentaFinanciera"")) = 3 
+                                                                            AND ""cMoneda"" = '0' AND length(RTRIM(""cCuentaTecnica"")) = 0
+                                                                        GROUP BY (""cCuentaPadre""), (""cCuentaFinanciera"")
+                                                                        order by ""cCuenta"" "));
+            queryIns = @" INSERT INTO ""iffPUC_Nivel_2"" 
+                                  VALUES ( @cCuentaPadre, @cCuenta , @tDescripcion )";
+
+            foreach (dynamic item in puc2)
+            {
+                object regPuc2 = new
+                {
+                    cCuentaPadre = item.cCuentaPadre.ToString(),
+                    cCuenta = item.cCuenta.ToString(),
+                    tDescripcion = item.tDescripcion.ToString()
+                };
+                conOLAPSql.Execute(queryIns, regPuc2);
+            }
+            con.Close();
+            conOLAPSql.Close();
 
 
-                                                                        select * from ""iftPlanUnicoCuentas"""));
+            ////////////////////////////////// iffPUC_Nivel_3 //////////////////////////////////////////
+
+            List<dynamic> puc3 = new List<dynamic>(con.Query<dynamic>(@"SELECT        TRIM(""cCuentaPadre"") as ""cCuentaPadre"", TRIM(""cCuentaFinanciera"") AS ""cCuenta"", '[' || TRIM(""cCuentaFinanciera"") || '] ' || MIN(""tDescripcion"") AS ""tDescripcion""
+                                                                        FROM          ""iftPlanUnicoCuentas""
+                                                                        WHERE        (LENGTH(RTRIM(""cCuentaFinanciera"")) = 5) AND (""cMoneda"" = '0') AND (length(RTRIM(""cCuentaTecnica"")) = 0)
+                                                                        GROUP BY TRIM(""cCuentaPadre""), TRIM(""cCuentaFinanciera"")
+                                                                        order by ""cCuenta""  "));
+
+            queryIns = @" INSERT INTO ""iffPUC_Nivel_3"" 
+                                  VALUES ( @cCuentaPadre, @cCuenta , @tDescripcion )";
+
+            foreach (dynamic item in puc3)
+            {
+                object regPuc3 = new
+                {
+                    cCuentaPadre = item.cCuentaPadre.ToString(),
+                    cCuenta = item.cCuenta.ToString(),
+                    tDescripcion = item.tDescripcion.ToString()
+                };
+                conOLAPSql.Execute(queryIns, regPuc3);
+
+            }
+            con.Close();
+            conOLAPSql.Close();
+
+            // ////////////////////////////////// iffPUC_Nivel_4 //////////////////////////////////////////
+
+            List<dynamic> puc4 = new List<dynamic>(con.Query<dynamic>(@"SELECT DISTINCT   TRIM(""cCuentaPadre"") as ""cCuentaPadre"", TRIM(""cCuentaFinanciera"") || TRIM(""cCuentaTecnica"") AS ""cCuenta"", '[' || TRIM(""cCuentaFinanciera"") || TRIM(""cCuentaTecnica"") || '] ' || MIN(""tDescripcion"") 
+                                                                                                AS ""tDescripcion""
+                                                                        FROM           ""iftPlanUnicoCuentas""
+                                                                        WHERE        (LENGTH(TRIM(""cCuentaFinanciera"")) = 5) AND (""cMoneda"" = '0') AND (LENGTH(TRIM(""cCuentaTecnica"")) = 2)
+                                                                        GROUP BY TRIM(""cCuentaPadre""), TRIM(""cCuentaFinanciera""), TRIM(""cCuentaTecnica"")
+                                                                        order by ""cCuenta""  "));
+
+            string queryIns4 = @" INSERT INTO ""iffPUC_Nivel_4"" 
+                                  VALUES ( @cCuentaPadre, @cCuenta , @tDescripcion )";
+
+            foreach (dynamic item in puc4)
+            {
+                object regPuc4 = new
+                {
+                    cCuentaPadre = item.cCuentaPadre.ToString(),
+                    cCuenta = item.cCuenta.ToString(),
+                    tDescripcion = item.tDescripcion.ToString()
+                };
+                conOLAPSql.Execute(queryIns4, regPuc4);
+
+            }
+            con.Close();
+            conOLAPSql.Close();
 
 
-            List<dynamic> puc4 = new List<dynamic>(con.Query<dynamic>(@"SELECT
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"" || ""cCuentaTecnica""  ""cCuenta"",
-                                                                            '[' || RTRIM (""cCuentaFinanciera"") || RTRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
-                                                                        FROM
-                                                                            ""iftPlanUnicoCuentas""
-                                                                        WHERE
-                                                                            length(RTRIM (""cCuentaFinanciera"")) = 5
-                                                                            AND ""cMoneda"" = '0'
-                                                                            AND length (RTRIM (""cCuentaTecnica""))  = 2
-                                                                        GROUP BY
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"",
-                                                                            ""cCuentaTecnica""
-                                                                        select * from ""iftPlanUnicoCuentas"""));
 
-            List<dynamic> puc3 = new List<dynamic>(con.Query<dynamic>(@"SELECT
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"" || ""cCuentaTecnica""  ""cCuenta"",
-                                                                            '[' || RTRIM (""cCuentaFinanciera"") || RTRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
-                                                                        FROM
-                                                                            ""iftPlanUnicoCuentas""
-                                                                        WHERE
-                                                                            length(RTRIM (""cCuentaFinanciera"")) = 5
-                                                                            AND ""cMoneda"" = '0'
-                                                                            AND length (RTRIM (""cCuentaTecnica""))  = 0
-                                                                        GROUP BY
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"",
-                                                                            ""cCuentaTecnica""
-                                                                        select * from ""iftPlanUnicoCuentas"""));
+            // ////////////////////////////////// iffPUC_Nivel_5 //////////////////////////////////////////
 
-            List<dynamic> puc2 = new List<dynamic>(con.Query<dynamic>(@"SELECT
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"" || ""cCuentaTecnica""  ""cCuenta"",
-                                                                            '[' || RTRIM (""cCuentaFinanciera"") || RTRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
-                                                                        FROM
-                                                                            ""iftPlanUnicoCuentas""
-                                                                        WHERE
-                                                                            length(RTRIM (""cCuentaFinanciera"")) = 3
-                                                                            AND ""cMoneda"" = '0'
-                                                                            AND length (RTRIM (""cCuentaTecnica""))  = 0
-                                                                        GROUP BY
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"",
-                                                                            ""cCuentaTecnica""
+            List<dynamic> puc5 = new List<dynamic>(con.Query<dynamic>(@"  SELECT        TRIM(""cCuentaPadre"") as ""cCuentaPadre"", TRIM(""cCuentaFinanciera"") || TRIM(""cCuentaTecnica"") AS ""cCuenta"", '[' || TRIM(""cCuentaFinanciera"") || TRIM(""cCuentaTecnica"") || '] ' || MIN(""tDescripcion"") 
+                                                                                                AS ""tDescripcion""
+                                                                        FROM        ""iftPlanUnicoCuentas""
+                                                                        WHERE        (LENGTH(TRIM(""cCuentaFinanciera"")) = 5) AND (""cMoneda"" = '0') AND (LENGTH(TRIM(""cCuentaTecnica"")) = 4)
+                                                                        GROUP BY TRIM(""cCuentaPadre""), TRIM(""cCuentaFinanciera""), TRIM(""cCuentaTecnica"")
+                                                                        order by ""cCuenta"" "));
 
+            queryIns = @" INSERT INTO ""iffPUC_Nivel_5"" 
+                                  VALUES ( @cCuentaPadre, @cCuenta , @tDescripcion )";
 
-                                                                        select * from ""iftPlanUnicoCuentas"""));
-            List<dynamic> puc1 = new List<dynamic>(con.Query<dynamic>(@"SELECT
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"" || ""cCuentaTecnica""  ""cCuenta"",
-                                                                            '[' || RTRIM (""cCuentaFinanciera"") || RTRIM (""cCuentaTecnica"") || '] ' || MIN (""tDescripcion"") ""tDescripcion""
-                                                                        FROM
-                                                                            ""iftPlanUnicoCuentas""
-                                                                        WHERE
-                                                                            length(RTRIM (""cCuentaFinanciera"")) = 1
-                                                                            AND ""cMoneda"" = '0'
-                                                                            AND length (RTRIM (""cCuentaTecnica""))  = 0
-                                                                        GROUP BY
-                                                                            ""cCuentaPadre"",
-                                                                            ""cCuentaFinanciera"",
-                                                                            ""cCuentaTecnica""
+            foreach (dynamic item in puc5)
+            {
+                object regPuc5 = new
+                {
+                    cCuentaPadre = item.cCuentaPadre.ToString(),
+                    cCuenta = item.cCuenta.ToString(),
+                    tDescripcion = item.tDescripcion.ToString()
+                };
+                conOLAPSql.Execute(queryIns, regPuc5);
 
+            }
+            con.Close();
+            conOLAPSql.Close();
 
-                                                                        select * from ""iftPlanUnicoCuentas"""));
         }
 
+        public void informacionFinancieraOLAP_iffPartesProduccionsiniestros()
+        {
+            ///////////////////////////////////////  iffPartesProduccionSiniestros ////////tiempo aprox: 5 m /////////////////////////////////
+            conOLAPSql.Execute("truncate table iffPartesProduccionSiniestros");
+
+            List<dynamic> iftPartesProduccionSiniestros = new List<dynamic>(con.Query<dynamic>(@"
+                                                                SELECT ""cEmpresa"",
+                                                                ""cTipoParte"",
+                                                                ""cDepartamento"",
+                                                                ""cSector"",
+                                                                ""cMoneda"",
+                                                                SUBSTRING ( CAST ( ""fInformacion"" AS CHAR(8) ), 1, 4)::INT  as ""cGestion"",
+                                                                SUBSTRING ( CAST ( ""fInformacion"" AS CHAR(8) ), 5, 2)::INT  AS ""cMes"" ,
+                                                                ""cModalidad"",
+                                                                case when ""cRamo"" in ('1','2','3','4','5','6','7','8','9') then '0' || rtrim(""cRamo"") else ""cRamo"" end as ""cRamo"",
+                                                                ""cPoliza"",
+                                                                ""mCapitalAsegurado"",
+                                                                ""qPolizaNuevas"",
+                                                                ""qPolizasRenovadas"",
+                                                                ""mPrimaDirecta"",
+                                                                ""mPrimaDirectaUFV"",
+                                                                ""mCapitalAnulado"",
+                                                                ""qPolizasAnuladas"",
+                                                                ""mPrimaAnulada"",
+                                                                ""mPrimaAnuladaUFV"",
+                                                                ""mCapitalAseguradoNeto"",
+                                                                ""qPolizasNetas"",
+                                                                ""mPrimaNeta"",
+                                                                ""mPrimaNetaUFV"",
+                                                                ""mPrimaAceptadaReaseguro"",
+                                                                ""mPrimaAceptadaReaseguroUFV"",
+                                                                ""mPrimaCedidaReaseguro"",
+                                                                ""mPrimaCedidaReaseguroUFV"",
+                                                                ""mAnulacionPrimaCedidaReaseguro"",
+                                                                ""mAnulacionPrimaCedidaReaseguroUFV"",
+                                                                ""qSiniestrosDenunciados"",
+                                                                ""mSiniestrosDenunciados"",
+                                                                ""qSiniestrosLiquidados"",
+                                                                ""mSiniestrosLiquidados"",
+                                                                ""mSiniestrosLiquidadosUFV"",
+                                                                ""mSiniestrosPagadosReaseguroAceptado"",
+                                                                ""mSiniestrosPagadosReaseguroAceptadoUFV"",
+                                                                ""mSiniestroReembolsadoReaseguroCedido"",
+                                                                ""mSiniestroReembolsadoReaseguroCedidoUFV""
+
+                                                                FROM ""iftPartesProduccionSiniestros"" "));
+
+            string queryIns = @" INSERT INTO ""iffPartesProduccionSiniestros"" 
+                                  VALUES (
+                                            @cEmpresa, @cTipoParte, @cDepartamento, @cSector, @cMoneda, 
+                                            @cGestion, @cMes, @cModalidad, @cRamo, @cPoliza, @mCapitalAsegurado, 
+                                            @qPolizaNuevas, @qPolizasRenovadas, @mPrimaDirecta, @mPrimaDirectaUFV, 
+                                            @mCapitalAnulado, @qPolizasAnuladas, @mPrimaAnulada, @mPrimaAnuladaUFV, 
+                                            @mCapitalAseguradoNeto, @qPolizasNetas, @mPrimaNeta, @mPrimaNetaUFV, 
+                                            @mPrimaAceptadaReaseguro, @mPrimaAceptadaReaseguroUFV, @mPrimaCedidaReaseguro, 
+                                            @mPrimaCedidaReaseguroUFV, @mAnulacionPrimaCedidaReaseguro, 
+                                            @mAnulacionPrimaCedidaReaseguroUFV, 
+                                            @qSiniestrosDenunciados, 
+                                            @mSiniestrosDenunciados, @qSiniestrosLiquidados, @mSiniestrosLiquidados, 
+                                            @mSiniestrosLiquidadosUFV, @mSiniestrosPagadosReaseguroAceptado, 
+                                            @mSiniestrosPagadosReaseguroAceptadoUFV, @mSiniestroReembolsadoReaseguroCedido, 
+                                            @mSiniestroReembolsadoReaseguroCedidoUFV) ";
+
+            foreach (dynamic item in iftPartesProduccionSiniestros)
+            {
+                object reg = new
+                {
+                    cEmpresa = item.cEmpresa,
+                    cTipoParte = item.cTipoParte,
+                    cDepartamento = item.cDepartamento,
+                    cSector = item.cSector,
+                    cMoneda = item.cMoneda,
+                    cGestion = item.cGestion,
+                    cMes = item.cMes,
+                    cModalidad = item.cModalidad,
+                    cRamo = item.cRamo,
+                    cPoliza = item.cPoliza,
+                    mCapitalAsegurado = item.mCapitalAsegurado,
+                    qPolizaNuevas = item.qPolizaNuevas,
+                    qPolizasRenovadas = item.qPolizasRenovadas,
+                    mPrimaDirecta = item.mPrimaDirecta,
+                    mPrimaDirectaUFV = item.mPrimaDirectaUFV,
+                    mCapitalAnulado = item.mCapitalAnulado,
+                    qPolizasAnuladas = item.qPolizasAnuladas,
+                    mPrimaAnulada = item.mPrimaAnulada,
+                    mPrimaAnuladaUFV = item.mPrimaAnuladaUFV,
+                    mCapitalAseguradoNeto = item.mCapitalAseguradoNeto,
+                    qPolizasNetas = item.qPolizasNetas,
+                    mPrimaNeta = item.mPrimaNeta,
+                    mPrimaNetaUFV = item.mPrimaNetaUFV,
+                    mPrimaAceptadaReaseguro = item.mPrimaAceptadaReaseguro,
+                    mPrimaAceptadaReaseguroUFV = item.mPrimaAceptadaReaseguroUFV,
+                    mPrimaCedidaReaseguro = item.mPrimaCedidaReaseguro,
+                    mPrimaCedidaReaseguroUFV = item.mPrimaCedidaReaseguroUFV,
+                    mAnulacionPrimaCedidaReaseguro = item.mAnulacionPrimaCedidaReaseguro,
+                    mAnulacionPrimaCedidaReaseguroUFV = item.mAnulacionPrimaCedidaReaseguroUFV,
+                    qSiniestrosDenunciados = item.qSiniestrosDenunciados,
+                    mSiniestrosDenunciados = item.mSiniestrosDenunciados,
+                    qSiniestrosLiquidados = item.qSiniestrosLiquidados,
+                    mSiniestrosLiquidados = item.mSiniestrosLiquidados,
+                    mSiniestrosLiquidadosUFV = item.mSiniestrosLiquidadosUFV,
+                    mSiniestrosPagadosReaseguroAceptado = item.mSiniestrosPagadosReaseguroAceptado,
+                    mSiniestrosPagadosReaseguroAceptadoUFV = item.mSiniestrosPagadosReaseguroAceptadoUFV,
+                    mSiniestroReembolsadoReaseguroCedido = item.mSiniestroReembolsadoReaseguroCedido,
+                    mSiniestroReembolsadoReaseguroCedidoUFV = item.mSiniestroReembolsadoReaseguroCedidoUFV
+                };
+                conOLAPSql.Execute(queryIns, reg);
+
+            }
+            con.Close();
+            conOLAPSql.Close();
+
+        }
+
+
+        public void informacionFinancieraOLAP_iffIndicadores()
+        {
+            ///////////////////////////////////////  iffIndicadores ///////////////tiempo aprox: 3 m //////////////////////////
+            conOLAPSql.Execute("truncate table iffIndicadores");
+
+            List<dynamic> iftIndicadores = new List<dynamic>(conSegSql.Query<dynamic>(@"
+                                                                SELECT ""cEmpresa"", 
+                                                                CAST ( SUBSTRING ( CAST ( fInformacion AS CHAR(8) ), 1, 4) AS INT ) as ""cGestion"",
+                                                                CAST ( SUBSTRING ( CAST ( fInformacion AS CHAR(8) ), 5, 2) AS INT ) as ""cMes"",
+                                                                ""cIndicador"", 
+                                                                ""mIndicador""
+                                                                FROM 
+                                                                ""iftIndicadores""
+                                                                WHERE (""cError"" = 0) "));
+
+            string queryIns = @" INSERT INTO ""iffIndicadores"" 
+                                  VALUES (
+                                            @cEmpresa,
+                                            @cGestion, @cMes, 
+                                            @cIndicador,
+                                            @mIndicador ) ";
+
+            foreach (dynamic item in iftIndicadores)
+            {
+                object reg = new
+                {
+                    cEmpresa = item.cEmpresa,
+                    cGestion = item.cGestion,
+                    cMes = item.cMes,
+                    cIndicador = item.cIndicador,
+                    mIndicador = item.mIndicador
+                };
+                conOLAPSql.Execute(queryIns, reg);
+
+            }
+            conSegSql.Close();
+            conOLAPSql.Close();
+
+        }
+
+        public void informacionFinancieraOLAP_iffBalanceEstadoResultados_T()
+        {
+            ///////////////////////////////////////  iffBalanceEstadoResultados_T /////// tiempo aprox: 23 m //////////////////////////////////
+            conOLAPSql.Execute("truncate table iffBalanceEstadoResultados_T");
+
+            List<dynamic> iffBER_T = new List<dynamic>(con.Query<dynamic>(@"
+                                                                        SELECT	SUBSTRING(CAST(""fInformacion"" AS CHAR(8)), 1, 4) AS ""cGestion"", 	
+                                                                        SUBSTRING(CAST(""fInformacion"" AS CHAR(8)), 5, 2) AS ""cMes"", 
+                                                                        ""cEmpresa"", 
+                                                                        RTRIM(""cCuentaFinanciera"") || RTRIM(""cCuentaTecnica"") AS ""cCuenta"", 
+                                                                        ""cMoneda"", 
+                                                                        ""mSaldoAnterior"", 
+                                                                        ""mMovimiento"", 
+                                                                        ""mSaldoActual""
+                                                                    FROM    ""iftBalanceEstadoResultados""
+                                                                    WHERE	LENGTH(RTRIM(""cCuentaFinanciera"") || RTRIM(""cCuentaTecnica"")) = 9 "));
+
+            string queryIns = @" INSERT INTO ""iffBalanceEstadoResultados_T"" 
+                                  VALUES (                                            
+                                            @cGestion, @cMes, 
+                                            @cEmpresa,
+                                            @cCuenta,
+                                            @cMoneda,
+                                            @mSaldoAnterior,
+                                            @mMovimiento,
+                                            @mSaldoActual
+                                             ) ";
+
+            foreach (dynamic item in iffBER_T)
+            {
+                object reg = new
+                {
+                    cGestion = item.cGestion,
+                    cMes = item.cMes,
+                    cEmpresa = item.cEmpresa,
+                    cCuenta = item.cCuenta,
+                    cMoneda = item.cMoneda,
+                    mSaldoAnterior = item.mSaldoAnterior,
+                    mMovimiento = item.mMovimiento,
+                    mSaldoActual = item.mSaldoActual
+                };
+                conOLAPSql.Execute(queryIns, reg);
+
+            }
+            con.Close();
+            conOLAPSql.Close();
+        }
+
+
+        public void informacionFinancieraOLAP_iftBalanceEstadoResultadosOLAP_T()
+        {
+            ///////////////////////////////////////  iftBalanceEstadoResultadosOLAP_T /////// tiempo aprox: 43 m //////////////////////////////////
+            conOLAPSql.Execute("truncate table iftBalanceEstadoResultadosOLAP_T");
+
+            List<dynamic> iftBerOLAP_T = new List<dynamic>(con.Query<dynamic>(@"
+                                                                        SELECT	SUBSTRING(CAST(""fInformacion"" AS CHAR(8)), 1, 4) AS ""cGestion"", 	
+                                                                        SUBSTRING(CAST(""fInformacion"" AS CHAR(8)), 5, 2) AS ""cMes"", 
+                                                                        ""cEmpresa"", 
+                                                                        RTRIM(""cCuentaFinanciera"") || RTRIM(""cCuentaTecnica"") AS ""cCuenta"", 
+                                                                        ""cMoneda"", 
+                                                                        ""mSaldoDebeAnterior"",
+                                                                        ""mSaldoHaberAnterior"",
+                                                                        ""mMovimientoDebe"",
+                                                                        ""mMovimientoHaber"",
+                                                                        ""mSaldoDebeActual"",
+                                                                        ""mSaldoHaberActual"",
+                                                                        ""mSaldoAnterior"", 
+                                                                        ""mMovimiento"", 
+                                                                        ""mSaldoActual""
+                                                                    FROM    ""iftBalanceEstadoResultados""
+                                                                    WHERE	LENGTH(RTRIM(""cCuentaFinanciera"") || RTRIM(""cCuentaTecnica"")) = 9 "));
+            con.Close();
+            string queryIns = @" INSERT INTO ""iftBalanceEstadoResultadosOLAP_T"" 
+                                  VALUES (                                            
+                                            @cGestion, @cMes, 
+                                            @cEmpresa,
+                                            @cCuenta,
+                                            @cMoneda,
+                                            @mSaldoDebeAnterior,
+                                            @mSaldoHaberAnterior,
+                                            @mMovimientoDebe,
+                                            @mMovimientoHaber,
+                                            @mSaldoDebeActual,
+                                            @mSaldoHaberActual,                                            
+                                            @mSaldoAnterior,
+                                            @mMovimiento,
+                                            @mSaldoActual
+                                             ) ";
+
+            foreach (dynamic item in iftBerOLAP_T)
+            {
+                object reg = new
+                {
+                    cGestion = item.cGestion,
+                    cMes = item.cMes,
+                    cEmpresa = item.cEmpresa,
+                    cCuenta = item.cCuenta,
+                    cMoneda = item.cMoneda,
+                    mSaldoDebeAnterior = item.mSaldoDebeAnterior,
+                    mSaldoHaberAnterior = item.mSaldoHaberAnterior,
+                    mMovimientoDebe = item.mMovimientoDebe,
+                    mMovimientoHaber = item.mMovimientoHaber,
+                    mSaldoDebeActual = item.mSaldoDebeActual,
+                    mSaldoHaberActual = item.mSaldoHaberActual,
+                    mSaldoAnterior = item.mSaldoAnterior,
+                    mMovimiento = item.mMovimiento,
+                    mSaldoActual = item.mSaldoActual
+                };
+                conOLAPSql.Execute(queryIns, reg);
+                conOLAPSql.Close();
+            }
+            con.Close();
+            conOLAPSql.Close(); 
+        }
 
 
     }

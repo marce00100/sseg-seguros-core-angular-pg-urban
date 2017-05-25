@@ -80,87 +80,97 @@ namespace SVD.Controllers
             Exception excepcion = null; // TO DO habilitar error para visualizar errores, deshabilitar en produccion 
             if (objObservaciones.observaciones == null)
                 objObservaciones.observaciones = "";
+
             if (enviosAct.Count > 0)
             {
-                // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
-                //INICIALIZA PROCESO CONSOLIDACION 
-                int id_consolidacion = this.insertConsolidacion(objObservaciones.observaciones.ToString());
+                // // dynamic consolidacionActiva = this.obtieneUltimaConsolidacion().data;
+                // //INICIALIZA PROCESO CONSOLIDACION 
+                //int id_consolidacion = this.insertConsolidacion(objObservaciones.observaciones.ToString());
 
-                foreach (dynamic envio in enviosAct)
-                {
-                    try
-                    {
-                        // Realiza la consolidacion por cada entidad que ha eviado y la info sea valida y activa, y no haya sido consolidaa
-                        if (envio.valido && (envio.estado_cierre == null || envio.estado_cierre == ""))
-                        {
-                            this.ctxSeguimiento = envio;
-                            this.codigoEntidad = ctxSeguimiento.cod_entidad;
+                // foreach (dynamic envio in enviosAct)
+                // {
+                //     try
+                //     {
+                //         // Realiza la consolidacion por cada entidad que ha eviado y la info sea valida y activa, y no haya sido consolidaa
+                //         if (envio.valido && (envio.estado_cierre == null || envio.estado_cierre == ""))
+                //         {
+                //             this.ctxSeguimiento = envio;
+                //             this.codigoEntidad = ctxSeguimiento.cod_entidad;
 
-                            // llena las tablas iftPartesProduccionSiniestros, 
-                            this.llenaIftPartesProduccionSiniestros(this.codigoEntidad);
-                            // llena las tablas iftPartesProduccionRamos, 
-                            this.llenaIftPartesProduccionRamos(this.codigoEntidad);
-                            // llena iftPartesSiniestrosRamos 
-                            this.llenaIftPartesSiniestrosRamos(this.codigoEntidad);
-                            // llena tabla , iftPartesSegurosLargoPlazo
-                            this.llenaIftPartesSegurosLargoPlazo(this.codigoEntidad);
-                            // Se realiza la consolidacion
-                            // carga los saldos totales de la tabla val_balance_estado_resultados
-                            this.llenaSaldosTotales(this.codigoEntidad);
-                            //  1  realiza la carga a la tabla iftBalanceEstadoResultados  sin duplicados
-                            this.consolidaInfoMensualAntesDeCierre(this.codigoEntidad);
-                            // 2. Consolida PartesProduccionCorredoras  iftPartesProduccionCorredoras
-                            this.consolidaProduccionCorredoras(this.codigoEntidad);
+                //             // llena las tablas iftPartesProduccionSiniestros, 
+                //             this.llenaIftPartesProduccionSiniestros(this.codigoEntidad);
+                //             // llena las tablas iftPartesProduccionRamos, 
+                //             this.llenaIftPartesProduccionRamos(this.codigoEntidad);
+                //             // llena iftPartesSiniestrosRamos 
+                //             this.llenaIftPartesSiniestrosRamos(this.codigoEntidad);
+                //             // llena tabla , iftPartesSegurosLargoPlazo
+                //             this.llenaIftPartesSegurosLargoPlazo(this.codigoEntidad);
+                //             // Se realiza la consolidacion
+                //             // carga los saldos totales de la tabla val_balance_estado_resultados
+                //             this.llenaSaldosTotales(this.codigoEntidad);
+                //             //  1  realiza la carga a la tabla iftBalanceEstadoResultados  sin duplicados
+                //             this.consolidaInfoMensualAntesDeCierre(this.codigoEntidad);
+                //             // 2. Consolida PartesProduccionCorredoras  iftPartesProduccionCorredoras
+                //             this.consolidaProduccionCorredoras(this.codigoEntidad);
 
-                            // 3 inserta las excepciones  Caso BUPA 201
-                            this.insertarComodines();
+                //             // 3 inserta las excepciones  Caso BUPA 201
+                //             this.insertarComodines();
 
-                            if (esMesSolvencia)
-                            {
-                                //inserta campos vacios por la entidad en las tablas iftPatrimonioTecnico y tMSPrevisionales
-                                this.insertaPatrimonioTecnicoVacio();
-                                this.insertaMargenSolvenciaPrevisionalesVacio();
-                            }
-                            this.paso = 1;
+                //             if (esMesSolvencia)
+                //             {
+                //                 //inserta campos vacios por la entidad en las tablas iftPatrimonioTecnico y tMSPrevisionales
+                //                 this.insertaPatrimonioTecnicoVacio();
+                //                 this.insertaMargenSolvenciaPrevisionalesVacio();
+                //             }
+                //             this.paso = 1;
 
-                            // // llama al metodo que realiza pasos para el cierre
-                            // this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
-                            // // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
-                            // this.procedimientosCierreHastaSIG(this.codigoEntidad);
-
-                            // this.informacionFinancieraOLAP();
+                //             // llama al metodo que realiza pasos para el cierre
+                //             this.procedimientosHastaMargenSolvencia(this.codigoEntidad);
+                //             // llama  a los procedimientos siguientes para informacion estadistica WEB y SIG
+                //             this.procedimientosCierreHastaSIG(this.codigoEntidad);
 
 
-                            ////_____________________________ se crea la respuesta  que es una lista de las compañias enviadas ________________________                    
-                            object seguimientoConsolidacion = new
-                            {
-                                id_seguimiento_envio = envio.id_seguimiento_envio,
-                                cod_entidad = envio.cod_entidad,
-                                id_consolidacion = id_consolidacion,
-                                estado_cierre = estadoCierre
-                            };
-                            // asigna el valor de id_consolidacion al seguimiento y le asigna su estadoCierre
-                            con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
-                            WHERE id_seguimiento_envio = @id_seguimiento_envio", seguimientoConsolidacion);
-                            con.Close();
+                //             ////////////////////// no aqui
+                //             // this.informacionFinancieraOLAP();
 
-                            listaRes.Add(seguimientoConsolidacion);
 
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        procesoExitoso = false;
-                        excepcion = e;
-                        break;
-                    };
-                };
+                //             ////_____________________________ se crea la respuesta  que es una lista de las compañias enviadas ________________________                    
+                //             object seguimientoConsolidacion = new
+                //             {
+                //                 id_seguimiento_envio = envio.id_seguimiento_envio,
+                //                 cod_entidad = envio.cod_entidad,
+                //                 id_consolidacion = id_consolidacion,
+                //                 estado_cierre = estadoCierre
+                //             };
+                //             // asigna el valor de id_consolidacion al seguimiento y le asigna su estadoCierre
+                //             con.Execute(@"UPDATE seguimiento_envios SET id_consolidacion = @id_consolidacion, estado_cierre = @estado_cierre
+                //             WHERE id_seguimiento_envio = @id_seguimiento_envio", seguimientoConsolidacion);
+                //             con.Close();
+
+                //             listaRes.Add(seguimientoConsolidacion);
+
+                //         }
+                //     }
+                //     catch (Exception e)
+                //     {
+                //         procesoExitoso = false;
+                //         excepcion = e;
+                //         break;
+                //     };
+                // };
+
+                // this.informacionFinancieraOLAP_PUC();
+                // this.informacionFinancieraOLAP_iffPartesProduccionsiniestros();
+                // this.informacionFinancieraOLAP_iffIndicadores();
+                // this.informacionFinancieraOLAP_iffBalanceEstadoResultados_T();
+                this.informacionFinancieraOLAP_iftBalanceEstadoResultadosOLAP_T();
 
                 estadoCierre = procesoExitoso ? estadoCierre : ""; //  si no hubo error se cambi al estado Consolidado o cerrado , segun si fue normal o trimestral, caso contrario "consolidacion.estado" vuelve al valor que tenia originalmente
-                this.estadoConsolidacion(id_consolidacion, estadoCierre, false);
+                // this.estadoConsolidacion(id_consolidacion, estadoCierre, false);
             }
             con.Close();
             conSegSql.Close();
+            conOLAPSql.Close();
             return new
             {
                 status = "success",
